@@ -1,5 +1,3 @@
-# KUMedPortfolio
-
 # 📚 KU Medical Center Portfolio
 
 Hi, I'm Lindsey! I am currently pursuing a Master's degree in applied statistics and data science at the University of Kansas Medical Center (KUMC). I also work as a data modernization intern for the Kansas Department of Health and Environment (KDHE) and as a student administrative assistant at the Institute for Policy and Social Research (IPSR) at KU. 
