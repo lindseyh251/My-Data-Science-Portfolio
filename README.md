@@ -26,8 +26,8 @@ This repository showcases the advanced projects and analyses I have completed du
 
 ## Table of Contents ## 
 - [Linear Regression Projects](#linear-regression-project)
-- [Categorical Data Analysis Project](#categorical-data-analysis-project)
-- [SAS Project](#sas-project)
+- [Categorical Data Analysis Projects](#categorical-data-analysis-project)
+- [SAS Projects](#sas-project)
 
 
 
