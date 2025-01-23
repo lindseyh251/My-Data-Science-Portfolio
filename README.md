@@ -1,8 +1,8 @@
 # 📚 KU Medical Center Portfolio
 
-Hi, I'm Lindsey! I am currently pursuing a Master's degree in applied statistics and data science at the University of Kansas Medical Center (KUMC). I also work as a data modernization intern for the Kansas Department of Health and Environment (KDHE) and as a student administrative assistant at the Institute for Policy and Social Research (IPSR) at KU. 
+Hi, I'm Lindsey! I am currently pursuing a Master's degree in applied statistics and data science at the University of Kansas Medical Center (KUMC). I also have a Bachelor's degree in Chemistry from Creighton University. Currently, I work as a data modernization intern for the Kansas Department of Health and Environment (KDHE) and as a student administrative assistant at the Institute for Policy and Social Research (IPSR) at KU. 
 
-This repository showcases the advanced projects and analyses I have completed during my Master's Program and demonstrates my knowledge of statistical modeling, programming, and data science. 
+This repository showcases the advanced projects and analyses I have completed during my courses and demonstrates my knowledge of statistical modeling, programming, and data science. 
 
 ## My Programming Languages ##
 - R
@@ -12,7 +12,7 @@ This repository showcases the advanced projects and analyses I have completed du
 - JMP
 
 
-## Courses ##
+## KU Med Courses ##
 - DATA 882: Statistical Learning II (ongoing - Spring 2025)
 - STAT 880: Data Mining and Analytics (ongoing - Spring 2025) 
 - DATA 881: Statistical Learning I 
@@ -28,7 +28,6 @@ This repository showcases the advanced projects and analyses I have completed du
 - [Linear Regression Projects](#linear-regression-project)
 - [Categorical Data Analysis Project](#categorical-data-analysis-project)
 - [SAS Project](#sas-project)
-
 
 
 
