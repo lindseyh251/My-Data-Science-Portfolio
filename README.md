@@ -28,6 +28,7 @@ This repository showcases the advanced projects and analyses I have completed du
 - [Linear Regression Projects](#linear-regression-project)
 - [Categorical Data Analysis Projects](#categorical-data-analysis-project)
 - [SAS Projects](#sas-project)
+- [Tableau Projects](#tableau-project)
 
 
 
