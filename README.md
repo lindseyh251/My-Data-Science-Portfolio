@@ -58,7 +58,7 @@ This project was completed in R for my Categorical Data Analysis course (STAT 83
 This archery scoring game was completed for my undergraduate python course. 
 
 ## Tableau Project ##
-[InsuranceDashboard.twbx]((https://github.com/lindseyh251/KUMedPortfolio/blob/main/InsuranceDashboard.twbx))
+[InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/InsuranceDashboard.twbx)
 
 ## Resume ## 
 
