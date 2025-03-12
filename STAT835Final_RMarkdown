@@ -1,0 +1,298 @@
+---
+title: "STAT 835: Final Project"
+author: "Lindsey Hornberger"
+date: "2024-10-05"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load packages
+library(tidyverse)
+library(caret)
+library(asbio)
+library(olsrr)
+library(xtable)
+library(shiny)
+library(knitr)
+library(DT)
+require(scatterplot3d)
+require(Hmisc)
+require(rgl)
+require(faraway)
+library(car)
+library(gam)
+# my data 
+data <- read_csv("~/Desktop/STAT 835/Final Project /heart_failure_clinical_records_dataset.csv", 
+                 col_types = cols(anaemia = col_skip(), 
+                                  creatinine_phosphokinase = col_skip(), 
+                                  diabetes = col_skip(), platelets = col_skip(), 
+                                  serum_sodium = col_skip(), time = col_skip()))
+data <- data %>% rename(HBP = high_blood_pressure)
+
+```
+
+## III. Results
+
+Fit the initial model: 
+```{r}
+fit <- glm(DEATH_EVENT~ejection_fraction+age+HBP+sex+serum_creatinine+smoking, family = binomial(link = logit), data)
+```
+
+```{r}
+summary(fit)
+Anova(fit)
+confint(fit)
+
+```
+The ML fit of the logistic regression model is 
+logit[Pˆ(y = 1)] = -2.28558 - 0.07249x1 + 0.05231x2 + 0.38794x3 - 0.30699x4 + 0.68922 + 0.03840. Since we have a large n value (299 with 6 predictor variables and degrees of freedom equal to 1), the Wald test was used at the 95% confidence level to determine if H0:βx = 0. The ejection fraction effect βˆ = -0.07249 and SE = 0.0145. The z-value = -4.990 with a p-value = 6.04e-07. Based on this, we have strong evidence to reject the null hypothesis and this provides very strong evidence that as ejection fraction decreases, tthe likelihood of a death event occurring increases.  The age effect βˆ = 0.05231 and SE = 0.01256. The z-value = 4.166 with a p-value = 3.10e-05. Based on this, we have strong evidence to reject the null hypothesis and this provides very strong evidence that as age increases, the likelihood of a death event occurring increases. The serum creatinine effect βˆ = 0.68922 and SE = 0.16579. The z-value = 4.157 with a p-value = 3.22e-05. Based on this, we have strong evidence to reject the null hypothesis and this provides very strong evidence that as serum creatinine levels increase, the likelihood of a death event occurring increases. The other three predictor variables: high blood pressure, sex, and smoking do not appear to be significant at the 95% confidence interval given this analysis. 
+
+### A. Diagnostics for Predictors.
+
+In order to determine the presence of any bivariate associations between predictor variables, we will compute a scatter plot matrix and Pearson correlation coefficient matrix. These two tests will help to determine if there is any multicollinearity between variables in the model. 
+```{r}
+pairs(DEATH_EVENT~ejection_fraction+age+HBP+sex+
+        serum_creatinine+smoking, data)
+```
+
+```{r}
+# The Pearson correlation coefficients for all pairwise association
+cor(data)
+```
+The largest Pearson correlation coefficient value is between smoking and sex +0.445891712 which indicates moderate correlation. All other correlation coefficients are below 0.29 which indicate weak correlation. 
+
+
+Strip plots for each continuous variable 
+```{r}
+for (i in 1:6){
+  par(mfrow=c(1,2))
+  stripchart(data[,i], main = names(data)[i],
+             vertical = T, method = "jitter")
+  boxplot(data[,i], main = names(data)[i])
+  par(mfrow=c(1,1))
+}
+
+stripchart(log(data$serum_creatinine), main = "log(serum creatinine)", vertical = T, method = "jitter")
+boxplot(log(data$serum_creatinine), main = "log(serum creatinine)")
+```
+For the three continuous variables: ejection fraction, age, and serum creatinine, strip plots were made. The variables age and ejection fraction appear to be evenly distributed with ejection fraction having a couple data points outside of the boxplot standard deviation. However, the serum creatinine data is positively skewed with most observations clustered together and a few observations at much higher levels. Due to this, we could consider a log transformation 
+
+Log transform serum creatinine variable 
+```{r}
+fit2 <- glm(DEATH_EVENT~ejection_fraction+age+HBP+sex+log(serum_creatinine)+smoking, family = binomial(link = logit), data)
+```
+
+
+
+### C. Screening of Predictors
+
+1. **Added variable plots** Partial Residual plots 
+```{r}
+prplot(fit2,1)
+prplot(fit2,2)
+prplot(fit2,3)
+prplot(fit2,4)
+prplot(fit2,5)
+prplot(fit2,6)
+```
+Scatterplot of y by different predictor variables 
+```{r}
+# ejection fraction
+plot(jitter(DEATH_EVENT, 0.08) ~ ejection_fraction, data=data)
+gam.fit1 <- gam(DEATH_EVENT ~ s(ejection_fraction), family=binomial, data=data) 
+curve(predict(gam.fit, data.frame(ejection_fraction=x), type="resp"), add=TRUE)
+# age 
+plot(jitter(DEATH_EVENT, 0.08) ~ age, data=data)
+gam.fit2 <- gam(DEATH_EVENT ~ s(age), family=binomial, data=data) 
+curve(predict(gam.fit2, data.frame(age=x), type="resp"), add=TRUE)
+# log(serum_creatinine)
+plot(jitter(DEATH_EVENT, 0.08) ~ log(serum_creatinine), data=data)
+gam.fit5 <- gam(DEATH_EVENT ~ s(log(serum_creatinine)), family=binomial, data=data) 
+curve(predict(gam.fit5, data.frame(serum_creatinine=x), type="resp"), add=TRUE)
+
+fitten <- glm(DEATH_EVENT ~ ejection_fraction, family=binomial, data=data)
+predict(fitten, data.frame(ejection_fraction = mean(data$ejection_fraction)), type="response")
+ # estimated probability of a death event at the mean ejection fraction 0.3039407
+```
+For the three continuous predictor variables, a curve of the generalized additive model smoothing fit and the logistic regression models are plotted. 
+Caption: Whether a death event occurs (y = 1, yes; y = 0, no), by x = ejection fraction of the patient, and generalized additive model smoothing fit.
+Repeat for each variable. 
+
+Fitted values and confidence intervals for probabilities (page 111)
+```{r}
+pred.prob <- fitted(fitten) # ML fitted value estimate of P(Y=1)
+lp <- predict(fitten, se.fit=TRUE) # linear predictor
+LB <- lp$fitten - 1.96*lp$se.fit # confidence bounds for linear predictor
+UB <- lp$fitten + 1.96*lp$se.fit # better: use qnorm(0.975) instead of 1.96
+LB.p <- exp(LB)/(1 + exp(LB)) # confidence bounds for P(Y=1)
+UB.p <- exp(UB)/(1 + exp(UB))
+cbind(pred.prob, LB.p, UB.p)
+```
+
+
+
+2. Look at VIF values 
+```{r}
+vif(fit)
+vif(fit2)
+vif(finalfit)
+```
+3. **Automatic variable selection methods**
+```{r}
+#Using AIC
+library(MASS)
+stepAIC(fit2)
+
+PRESS(fit2)
+
+# trying something
+fit3 <- glm(DEATH_EVENT ~ ejection_fraction + age + HBP + sex + smoking+
+    log(serum_creatinine) + ejection_fraction*sex, family = binomial, data = data)
+stepAIC(fit3)
+
+# for chart 
+glm1 <- glm(DEATH_EVENT~ejection_fraction, family = binomial, data = data)
+AIC(glm1)
+glm2 <- glm(DEATH_EVENT~ejection_fraction+age, family = binomial, data = data)
+AIC(glm2)
+glm3 <- glm(DEATH_EVENT~ejection_fraction+age+HBP, family = binomial, data = data)
+AIC(glm3)
+glm4 <- glm(DEATH_EVENT~ejection_fraction+age+HBP+sex, family = binomial, data = data)
+AIC(glm4)
+glm5 <- glm(DEATH_EVENT~ejection_fraction+age+HBP+sex+log(serum_creatinine), family = binomial, data = data)
+AIC(glm5)
+glm6 <- glm(DEATH_EVENT~ejection_fraction+age+HBP+sex+log(serum_creatinine)+smoking, family = binomial, data = data)
+AIC(glm6)
+glm7 <- glm(DEATH_EVENT~ejection_fraction+age+HBP+sex+log(serum_creatinine)+smoking +ejection_fraction*sex,family = binomial, data = data)
+AIC(glm7)
+glm8 <- glm(DEATH_EVENT~ejection_fraction+age+HBP+sex+log(serum_creatinine)+ejection_fraction*sex, family = binomial, data = data)
+AIC(glm8)
+
+prediction <- predict(finalfit, data, 
+                      type="response")
+# create roc curve
+prediction1 <- predict(glm1, data, type="response")
+roc_object1 <- roc(data$DEATH_EVENT, prediction1)
+auc(roc_object1)
+prediction2 <- predict(glm2, data, type="response")
+roc_object2 <- roc(data$DEATH_EVENT, prediction2)
+auc(roc_object2)
+prediction3 <- predict(glm3, data, type="response")
+roc_object3 <- roc(data$DEATH_EVENT, prediction3)
+auc(roc_object3)
+prediction4 <- predict(glm4, data, type="response")
+roc_object4 <- roc(data$DEATH_EVENT, prediction4)
+auc(roc_object4)
+prediction5 <- predict(glm5, data, type="response")
+roc_object5 <- roc(data$DEATH_EVENT, prediction5)
+auc(roc_object5)
+prediction6 <- predict(glm6, data, type="response")
+roc_object6 <- roc(data$DEATH_EVENT, prediction6)
+auc(roc_object6)
+prediction7 <- predict(glm7, data, type="response")
+roc_object7 <- roc(data$DEATH_EVENT, prediction7)
+auc(roc_object7)
+prediction8 <- predict(glm8, data, type="response")
+roc_object8 <- roc(data$DEATH_EVENT, prediction8)
+auc(roc_object8)
+# for each in chart!!!!!! dont forget to add those other plots 
+# PRESS VALUES 
+PRESS(glm1)
+PRESS(glm2)
+PRESS(glm3)
+PRESS(glm4)
+PRESS(glm5)
+PRESS(glm6)
+PRESS(glm7)
+PRESS(glm8)
+```
+ROC curve
+```{r}
+finalfit <- glm(DEATH_EVENT ~ ejection_fraction + age + HBP + sex +
+    log(serum_creatinine) + ejection_fraction*sex, family = binomial, data = data)
+
+library(pROC)
+
+prediction <- predict(finalfit, data, 
+                      type="response")
+# create roc curve
+roc_object <- roc(data$DEATH_EVENT, prediction)
+# area under the curve = 0.8024
+auc(roc_object)
+#ROC curve for fit0
+rocplot0 <- roc(DEATH_EVENT~fitted(fit0), data)
+plot.roc(rocplot0, legacy.axes = TRUE)
+
+abline(v=1)
+abline(h=1)
+
+rocplot <- roc(DEATH_EVENT~fitted(fit), data)
+plot.roc(rocplot, legacy.axes = TRUE)
+
+abline(v=1)
+abline(h=1)
+
+rocplot2 <- roc(DEATH_EVENT~fitted(finalfit), data)
+plot.roc(rocplot2, legacy.axes = TRUE)
+
+abline(v=1)
+abline(h=1)
+
+# R value 
+cor(data$DEATH_EVENT, fitted(finalfit))
+```
+Caption: ROC curve for logistic regression model with final model. 
+A receiver operating characteristic (ROC) curve plots sensitivity on the vertical axis versus (1 − specificity) on the horizontal axis. reference for textbook!! It summarizes the predictive power for all possible π0. The greater the area under the curve, the better the predictive power of the model. 
+
+
+Residual plots 
+```{r}
+# Residual plots 
+raw_residual=data$DEATH_EVENT-fitted(finalfit)
+plot(raw_residual~fitted(finalfit))
+
+plot(residuals(finalfit)~fitted(finalfit))
+```
+Interaction plots
+```{r}
+
+age.i <- data$age > mean(data$age)
+ef.i <- data$ejection_fraction > mean(data$ejection_fraction)
+HBP.i <- data$HBP > mean(data$HBP)
+sc.i <- log(data$serum_creatinine) > mean(log(data$serum_creatinine))
+smoking.i <- data$smoking > mean(data$smoking)
+sex.i <- data$sex > mean(data$sex)
+
+interaction.plot(ef.i,age.i,data$DEATH_EVENT)
+interaction.plot(ef.i,HBP.i,data$DEATH_EVENT) # Look at that! Is it significant?
+interaction.plot(ef.i,sc.i,data$DEATH_EVENT)
+interaction.plot(ef.i,smoking.i,data$DEATH_EVENT)
+interaction.plot(ef.i,sex.i,data$DEATH_EVENT)
+
+interactionfit <- glm(DEATH_EVENT ~ ejection_fraction + age + HBP + 
+    log(serum_creatinine) + ejection_fraction*sex, family = binomial, data = data)
+Anova(interactionfit)
+# Does not appear to be significant at the 95% level therefore, we will not include 
+# the interaction term in our final model. 
+```
+
+#### 2. **Outliers**
+
+```{r}
+plot(residuals(finalfit)~fitted(finalfit))
+
+plot(cooks.distance(finalfit)) # Compare percentile F(p,n-p) to 10th or 20th
+which(cooks.distance(finalfit)>0.115663) #2/sqrt(n)
+
+```
+
+```{r}
+summary(finalfit)
+Anova(finalfit)
+```
+
+
+
+
