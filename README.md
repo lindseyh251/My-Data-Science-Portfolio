@@ -34,11 +34,13 @@ This repository showcases the advanced projects and analyses I have completed du
 
 
 ## Linear Regression Modeling Projects ## 
-[Predicting Life Expectancy of Different Countries from Gross Domestic Product.pdf](https://github.com/user-attachments/files/18525467/Predicting.Life.Expectancy.of.Different.Countries.from.Gross.Domestic.Product.pdf)
+[Predicting Life Expectancy of Different Countries from Gross Domestic Product.pdf]([https://github.com/user-attachments/files/18525467/Predicting.Life.Expectancy.of.Different.Countries.from.Gross.Domestic.Product.pdf](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20Life%20Expectancy%20of%20Different%20Countries%20from%20Gross%20Domestic%20Product%20(R%20code))
+[Final Project Paper](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20Life%20Expectancy%20of%20Different%20Countries%20from%20Gross%20Domestic%20Product.pdf)
 
 This project was completed in R for my Linear Regression course (STAT 840) and investigates the relationship between GDP and life expectancy across different countries between 2000 and 2015 while controlling for other potential sources of variation. 
 
-[Predicting Prostate Specific Antigen Levels from Prognostic Clinical Measurements in Men with Advanced Prostate Cancer.pdf](https://github.com/user-attachments/assets/4aaf3e50-7f1c-4b74-a215-51f7569179c9)
+[Predicting Prostate Specific Antigen Levels from Prognostic Clinical Measurements in Men with Advanced Prostate Cancer.pdf]([https://github.com/user-attachments/assets/4aaf3e50-7f1c-4b74-a215-51f7569179c9](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20PSA%20Levels%20from%20Prognostic%20Clinical%20Measurements%20in%20Men%20with%20Advanced%20Prostate%20Cancer%20(R%20code))
+[Final Project Paper](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20PSA%20Levels%20from%20Prognostic%20Clinical%20Measurements%20in%20Men%20with%20Advanced%20Prostate%20Cancer.pdf)
 [(R Markdown zip)](https://github.com/user-attachments/files/18524985/Final.Rmd.zip)
 [PowerPointSlidesforPSA.pptx](https://github.com/user-attachments/files/18526051/PSAFinal.pptx)
 
@@ -59,6 +61,7 @@ This archery scoring game was completed for my undergraduate python course.
 
 ## Tableau Project ##
 [InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/InsuranceDashboard.twbx)
+[Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
 
 ## Resume ## 
 
