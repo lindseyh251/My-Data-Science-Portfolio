@@ -8,8 +8,6 @@ This repository showcases the advanced projects and analyses I have completed du
 - R
 - Python
 - Tableau
-- SAS
-- JMP
 
 
 ## KU Med Courses ##
@@ -27,7 +25,7 @@ This repository showcases the advanced projects and analyses I have completed du
 ## Table of Contents ## 
 - [Linear Regression Projects](#linear-regression-project)
 - [Categorical Data Analysis Projects](#categorical-data-analysis-project)
-- [SAS Projects](#sas-project)
+- [Python Projects](#python-project)
 - [Tableau Projects](#tableau-project)
 
 
