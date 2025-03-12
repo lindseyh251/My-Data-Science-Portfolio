@@ -49,7 +49,8 @@ This project was completed in R for my Introduction to Programming and Applied S
 
 
 ## Categorical Data Analysis Project ## 
-[Predicting a Death Event from Ejection Fraction Values in Patients with Cardiovascular Diseases.pdf](https://github.com/user-attachments/files/18525565/FINALpdf.pdf)
+[Predicting a Death Event from Ejection Fraction Values in Patients with Cardiovascular Diseases.pdf](https://github.com/lindseyh251/KUMedPortfolio/blob/94005eaa2b95a1fa0a9432c676e9baf80ac6b742/Predicting%20a%20Death%20Event%20from%20Ejection%20Fraction%20Values%20in%20Patients%20with%20Cardiovascular%20Disease%20(R%20code))
+[Final Project Paper](https://github.com/lindseyh251/KUMedPortfolio/blob/94005eaa2b95a1fa0a9432c676e9baf80ac6b742/Predicting%20a%20Death%20Event%20from%20Ejection%20Fraction%20Values%20in%20Patients%20with%20Cardiovascular%20Disease.pdf)
 [(R Markdown zip)](https://github.com/user-attachments/files/18525574/MyFinal.Rmd.zip)
 
 This project was completed in R for my Categorical Data Analysis course (STAT 835) and investigates the relationship between a “death event” (0,1) and ejection fraction for patients at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan) during April–December 2015 while controlling for other potential sources of variation.
