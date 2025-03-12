@@ -53,12 +53,12 @@ This project was completed in R for my Introduction to Programming and Applied S
 
 This project was completed in R for my Categorical Data Analysis course (STAT 835) and investigates the relationship between a “death event” (0,1) and ejection fraction for patients at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan) during April–December 2015 while controlling for other potential sources of variation.
 
-## Python Project ##
+## Python Projects ##
 [ArcheryScorer.py.zip](https://github.com/user-attachments/files/18525980/ArcheryScorer.py.zip)
 
 This archery scoring game was completed for my undergraduate python course. 
 
-## Tableau Project ##
+## Tableau Projects ##
 [InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/InsuranceDashboard.twbx)
 [Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
 
