@@ -63,8 +63,6 @@ This archery scoring game was completed during my undergraduate python course.
 [Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
 
 ## Resume ## 
-
-[Lindsey Hornberger 2025.pdf](https://github.com/lindseyh251/KUMedPortfolio/blob/main/Lindsey Hornberger 2025.pdf)
 [View My Resume](https://github.com/lindseyh251/KUMedPortfolio/blob/main/Lindsey_Hornberger_2025.pdf)
 
 
