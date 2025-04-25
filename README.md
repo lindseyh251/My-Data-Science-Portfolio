@@ -67,6 +67,7 @@ This archery scoring game was completed during my undergraduate python course.
 [Lindsey Hornberger 2025.pdf](https://github.com/lindseyh251/KUMedPortfolio/blob/main/Lindsey Hornberger 2025.pdf)
 [View My Resume](https://github.com/lindseyh251/KUMedPortfolio/blob/main/Lindsey_Hornberger_2025.pdf)
 
+
 ## Contact ##
 Please connect with me on [LinkedIn](https://www.linkedin.com/in/lindsey-hornberger/)
 or email me at ljvbcllh@gmail.com. 
