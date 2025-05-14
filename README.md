@@ -59,12 +59,13 @@ This project was completed in R for my Categorical Data Analysis course (STAT 83
 This archery scoring game was completed during am undergraduate python course competition. 
 
 ## Data Visualization Projects (Tableau and RShiny) ##
-[InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/InsuranceDashboard.twbx)
+[InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/InsuranceDashboard.twbx)
 [Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
 
+This project was completed during my data modernization internship and is an interactive Tableau dashboard that visualizes the change in insurance charges of patients based on age, BMI, sex, US Region, number of dependents, and smoker status. 
 
 
-[KS_Population_RShiny_App](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/KS_Population_RShiny_App)
+[KS_Population_RShiny_App](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/KS_Population_RShiny_App)                                                          
 This project was completed for my DATA 824 course and is an interactive R Shiny dashboard that analyzes the population and population change of different Kansas counties from 2010 - 2018. 
 
 ## Resume ## 
