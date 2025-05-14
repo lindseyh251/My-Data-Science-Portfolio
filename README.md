@@ -58,9 +58,11 @@ This project was completed in R for my Categorical Data Analysis course (STAT 83
 
 This archery scoring game was completed during my undergraduate python course. 
 
-## Tableau Projects ##
+## Data Visualization Projects (Tableau and RShiny) ##
 [InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/InsuranceDashboard.twbx)
 [Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
+
+[KS_Population_RShiny_App](https://github.com/lindseyh251/KUMedPortfolio/blob/main/KS_Population_RShiny_App)
 
 ## Resume ## 
 [View My Resume](https://github.com/lindseyh251/KUMedPortfolio/blob/main/Lindsey_Hornberger_2025.pdf)
