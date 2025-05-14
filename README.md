@@ -62,10 +62,8 @@ This archery scoring game was completed during am undergraduate python course co
 [InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/InsuranceDashboard.twbx)
 [Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
 
-Kansas Population Data 2010-2018 Analysis
-
+### Kansas Population Data 2010-2018 Analysis ###
 [KS_Population_RShiny_App](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/KS_Population_RShiny_App)
-
 This project was completed for my DATA 824 course and is an interactive R Shiny dashboard that analyzes the population and population change of different Kansas counties from 2010 - 2018. 
 
 ## Resume ## 
