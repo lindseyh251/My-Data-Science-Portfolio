@@ -62,7 +62,7 @@ This archery scoring game was completed during my undergraduate python course.
 [InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/InsuranceDashboard.twbx)
 [Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
 
-[KS_Population_RShiny_App](https://github.com/lindseyh251/KUMedPortfolio/blob/main/KS_Population_RShiny_App)
+[KS_Population_RShiny_App](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/KS_Population_RShiny_App)
 
 ## Resume ## 
 [View My Resume](https://github.com/lindseyh251/KUMedPortfolio/blob/main/Lindsey_Hornberger_2025.pdf)
