@@ -26,7 +26,7 @@ This repository showcases the advanced projects and analyses I have completed du
 - [Linear Regression Projects](#linear-regression-project)
 - [Categorical Data Analysis Projects](#categorical-data-analysis-project)
 - [Python Projects](#python-project)
-- [Tableau Projects](#tableau-project)
+- [Data Visualization Projects (Tableau and RShiny)](#tableau-project)
 
 
 
