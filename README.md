@@ -56,13 +56,16 @@ This project was completed in R for my Categorical Data Analysis course (STAT 83
 ## Python Projects ##
 [ArcheryScorer.py.zip](https://github.com/user-attachments/files/18525980/ArcheryScorer.py.zip)
 
-This archery scoring game was completed during my undergraduate python course. 
+This archery scoring game was completed during am undergraduate python course competition. 
 
 ## Data Visualization Projects (Tableau and RShiny) ##
 [InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/InsuranceDashboard.twbx)
 [Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
 
+Kansas Population Data 2010-2018 Analysis
 [KS_Population_RShiny_App](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/KS_Population_RShiny_App)
+
+This project was completed for my DATA 824 course and is an interactive R Shiny dashboard that analyzes the population and population change of different Kansas counties from 2010 - 2018. 
 
 ## Resume ## 
 [View My Resume](https://github.com/lindseyh251/KUMedPortfolio/blob/main/Lindsey_Hornberger_2025.pdf)
