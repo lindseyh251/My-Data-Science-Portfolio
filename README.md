@@ -1,4 +1,4 @@
-# 📚 KUMC Data Science Portfolio
+# 📚 My Data Science Portfolio
 
 Hi, I'm Lindsey! I am currently pursuing a Master's degree in applied statistics and data science at the University of Kansas Medical Center (KUMC). I also have a Bachelor's degree in Chemistry from Creighton University. Currently, I work as a data modernization intern for the Kansas Department of Health and Environment (KDHE) and as a graduate assistant at the Institute for Policy and Social Research (IPSR) at KU. 
 
