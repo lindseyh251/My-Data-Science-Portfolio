@@ -54,7 +54,7 @@ This project was completed in R for my Introduction to Programming and Applied S
 This project was completed in R for my Categorical Data Analysis course (STAT 835) and investigates the relationship between a “death event” (0,1) and ejection fraction for patients at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan) during April–December 2015 while controlling for other potential sources of variation.
 
 ## Python Projects ##
-[FinalCNN.py](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/CNN Project/FinalCNN.py)
+[FinalCNN.py](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/cnn_project/FinalCNN.py)
 
 This project was for my STAT 882 course in which I built a convolutional neural network to classify images from a data repository containing 5,000 small images (32x32) of 2 groups (horses and deer). For my project, I split the data 80% training and 20% validataion with the goal of getting an accuracy > 0.80. I used Jupyter notebook and used the python packages Keras, Tensorflow, and Matplotlib. 
 
