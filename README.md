@@ -6,7 +6,7 @@ This repository showcases the advanced projects and analyses I have completed du
 
 ## My Programming Languages ##
 - R
-- Python (ex: jupyter, TensorFlow, PyTorch)
+- Python (ex: Jupyter, TensorFlow, PyTorch, Pandas)
 - Tableau
 
 
