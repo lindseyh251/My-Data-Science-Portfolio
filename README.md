@@ -58,6 +58,11 @@ This project was completed in R for my Categorical Data Analysis course (STAT 83
 
 This archery scoring game was completed during am undergraduate python course competition. 
 
+
+[FinalCNN.py](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/FinalCNN.py)
+
+This project was for my STAT 882 course in which I built a convolutional neural network to classify images from a data repository containing 5,000 small images (32x32) of 2 groups (horses and deer). For my project, I split the data 80% training and 20% validataion with the goal of getting an accuracy > 0.80. I used Jupyter notebook and used the python packages Keras, Tensorflow, and Matplotlib. 
+
 ## Data Visualization Projects (Tableau and RShiny) ##
 [InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/InsuranceDashboard.twbx)
 [Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
