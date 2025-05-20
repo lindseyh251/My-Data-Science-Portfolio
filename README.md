@@ -60,7 +60,7 @@ This project was for my STAT 882 course in which I built a convolutional neural 
 
 [ArcheryScorer.py.zip](https://github.com/user-attachments/files/18525980/ArcheryScorer.py.zip)
 
-This archery scoring game was completed during am undergraduate python course competition.
+This archery scoring game was completed during an undergraduate python course competition.
 
 
 ## Data Visualization Projects (Tableau and RShiny) ##
