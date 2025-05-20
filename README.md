@@ -11,8 +11,8 @@ This repository showcases the advanced projects and analyses I have completed du
 
 
 ## KU Med Courses ##
-- DATA 882: Statistical Learning II (ongoing - Spring 2025)
-- STAT 880: Data Mining and Analytics (ongoing - Spring 2025) 
+- DATA 882: Statistical Learning II 
+- STAT 880: Data Mining and Analytics 
 - DATA 881: Statistical Learning I 
 - STAT 820: SAS Programming I 
 - STAT 805: Professionalism, Ethics, and Leadership in the Statistical Sciences 
