@@ -54,17 +54,17 @@ This project was completed in R for my Introduction to Programming and Applied S
 This project was completed in R for my Categorical Data Analysis course (STAT 835) and investigates the relationship between a “death event” (0,1) and ejection fraction for patients at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan) during April–December 2015 while controlling for other potential sources of variation.
 
 ## Python Projects ##
-[FinalCNN.py](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/cnn_project/FinalCNN.py)
+[Final CNN Project](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/cnn_project/FinalCNN.py)
 
 This project was for my STAT 882 course in which I built a convolutional neural network to classify images from a data repository containing 5,000 small images (32x32) of 2 groups (horses and deer). For my project, I split the data 80% training and 20% validataion with the goal of getting an accuracy > 0.80. I used Jupyter notebook and used the python packages Keras, Tensorflow, and Matplotlib. 
 
-[ArcheryScorer.py](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/archery_scorer_project/archery_scorer.py)
+[Archery Scorer Project](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/archery_scorer_project/archery_scorer.py)
 
 This archery scoring game was completed during an undergraduate python course competition.
 
 
 ## Data Visualization Projects (Tableau and RShiny) ##
-[InsuranceDashboard.twbx](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/InsuranceDashboard.twbx)
+[Insurance Dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/InsuranceDashboard.twbx)
 [Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
 
 This project was completed during my data modernization internship and is an interactive Tableau dashboard that visualizes the change in insurance charges of patients based on age, BMI, sex, US Region, number of dependents, and smoker status. 
