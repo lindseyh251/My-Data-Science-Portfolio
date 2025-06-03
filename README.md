@@ -64,8 +64,8 @@ This archery scoring game was completed during an undergraduate python course co
 
 
 ## Data Visualization Projects (Tableau and RShiny) ##
-[Insurance Dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/InsuranceDashboard.twbx)
-[Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/InsuranceDashboard.png)
+[Insurance Dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/insurance_project/InsuranceDashboard.twbx)
+[Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/insurance_project/InsuranceDashboard.png)
 
 This project was completed during my data modernization internship and is an interactive Tableau dashboard that visualizes the change in insurance charges of patients based on age, BMI, sex, US Region, number of dependents, and smoker status. 
 
