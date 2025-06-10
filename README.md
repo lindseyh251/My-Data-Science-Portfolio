@@ -5,7 +5,7 @@ Hi, I'm Lindsey! I am currently pursuing a Master's degree in applied statistics
 This repository showcases the advanced projects and analyses I have completed during my courses and demonstrates my knowledge of statistical modeling, programming, and data science. 
 
 ## My Programming Languages ##
-- R
+- R (ex: Shiny) 
 - Python (ex: Jupyter, TensorFlow, PyTorch, Pandas)
 - Tableau
 
@@ -75,7 +75,7 @@ This project was completed during my data modernization internship and is an int
 This project was completed for my DATA 824 course and is an interactive R Shiny dashboard that analyzes the population and population change of different Kansas counties from 2010 - 2018. 
 
 ## Resume ## 
-[View My Resume](https://github.com/lindseyh251/KUMedPortfolio/blob/main/Lindsey_Hornberger_2025.pdf)
+[My Resume](https://github.com/lindseyh251/KUMedPortfolio/blob/main/Lindsey_Hornberger_2025.pdf)
 
 
 ## Contact ##
