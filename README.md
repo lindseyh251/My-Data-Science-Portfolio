@@ -5,9 +5,9 @@ Hi, I'm Lindsey! I am currently pursuing a Master's degree in applied statistics
 This repository showcases the advanced projects and analyses I have completed during my courses and demonstrates my knowledge of statistical modeling, programming, and data science. 
 
 ## My Programming Languages ##
-- R (ex: Shiny) 
-- Python (ex: Jupyter, TensorFlow, PyTorch, Pandas)
-- Tableau
+- R & Shiny (for interactive applications), data visualization, statistical modeling
+- Python — Jupyter notebooks, TensorFlow, PyTorch, Pandas (for machine learning, data manipulation, and deep learning)
+- Tableau — interactive business intelligence, data visualization, and reporting
 
 
 ## KU Med Courses ##
