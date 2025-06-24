@@ -1,6 +1,6 @@
 # 📚 My Data Science Portfolio
 
-Hi, I'm Lindsey! I am currently pursuing a Master's degree in applied statistics and data science at the University of Kansas Medical Center (KUMC). I also have a Bachelor's degree in Chemistry from Creighton University. Currently, I work as a graduate assistant at the Institute for Policy and Social Research (IPSR) at KU, and I previously worked as a data modernization intern for the Kansas Department of Health and Environment (KDHE). 
+Hi, I'm Lindsey! I recently graduated with a Master's degree in applied statistics and data science at the University of Kansas Medical Center (KUMC). I also have a Bachelor's degree in Chemistry from Creighton University. Currently, I work as a graduate assistant at the Institute for Policy and Social Research (IPSR) at KU, and I previously worked as a data modernization intern for the Kansas Department of Health and Environment (KDHE). 
 
 This repository showcases the advanced projects and analyses I have completed during my courses and demonstrates my knowledge of statistical modeling, programming, and data science. 
 
