@@ -3,9 +3,9 @@
 Hi, I'm Lindsey! I recently graduated with a Master's degree in applied statistics and data science at the University of Kansas Medical Center (KUMC). I also have a Bachelor's degree in Chemistry from Creighton University. This repository showcases the advanced projects and analyses I have completed during my courses and demonstrates my knowledge of statistical modeling, programming, and data science. 
 
 ## My Programming Languages ##
-- R  — (Shiny for interactive applications), data visualization, statistical modeling
+- R  — statistical analysis, predictive modelling, and linear/logistic regression 
 - Python — Jupyter notebooks, TensorFlow, PyTorch, Pandas (for machine learning, data manipulation, and deep learning)
-- Tableau — interactive business intelligence, data visualization, and reporting
+- Tableau — interactive business intelligence analyses, data visualization, and reporting
 
 
 ## KU Med Courses ##
@@ -29,10 +29,19 @@ Hi, I'm Lindsey! I recently graduated with a Master's degree in applied statisti
 
 
 ## R Projects ## 
-[Predicting Life Expectancy of Different Countries from Gross Domestic Product](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20Life%20Expectancy%20of%20Different%20Countries%20from%20Gross%20Domestic%20Product%20(R%20code))
-[Final Project Paper](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20Life%20Expectancy%20of%20Different%20Countries%20from%20Gross%20Domestic%20Product.pdf)
+[Profiling Royals Hitters using Classification and Principal Components (2024 season)](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/9c80ab2940fe699ebb6a92f7d3bfcf3dcc4f10d3/my_projects/royals_hitters)
 
-This project was completed in R for my Linear Regression course (STAT 840) and investigates the relationship between GDP and life expectancy across different countries between 2000 and 2015 while controlling for other potential sources of variation. 
+This is a k-means classification analysis of the Royals hitters from the 2024 season (with AB>25) based on variables such as Age, BB, SO, HR, SB, CS, X2B, X3B, PA, AB, HBP, GDP, BB_rate = BB / PA, SO_rate = SO / PA, HR_rate = HR / PA, XBH = X2B + X3B + HR, XBH_rate = XBH / PA,SB_success = SB / (SB + CS). This project using principal component analysis (PCA) and classified the players into three clusters which are visualized here: [Royals Hitting PCA Chart](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/a9b2b8255321110a0efde6eb4667681dff8570b4/my_projects/royals_hitters/profiling_royals_hitters_PC_chart.pdf)
+
+[Predicting Presence at March Madness Tournament 2024](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/84192183ebe2db30f0bdb03f61f3e8437c26a7a0/my_projects/march_madness_projects/march_madness_2024.R)
+
+This is a logistic regression analysis to predict if a team will make it to the March Madness Tournament based on team statistics such as Pre-Tournament.AdjTempo, Pre-Tournament.AdjOE, Pre-Tournament.AdjDE, Pre-Tournament.AdjEM, AvgHeight, and Experience. I used cross-validation to prevent overfitting and calculated AUC/ROC graph, and a confusion matrix to visualize accuracy and precision (AUC = 0.9 and PPV = 0.75). 
+
+[Predicting a Death Event from Ejection Fraction Values in Patients with Cardiovascular Diseases](https://github.com/lindseyh251/KUMedPortfolio/blob/94005eaa2b95a1fa0a9432c676e9baf80ac6b742/Predicting%20a%20Death%20Event%20from%20Ejection%20Fraction%20Values%20in%20Patients%20with%20Cardiovascular%20Disease%20(R%20code))
+[Final Project Paper](https://github.com/lindseyh251/KUMedPortfolio/blob/94005eaa2b95a1fa0a9432c676e9baf80ac6b742/Predicting%20a%20Death%20Event%20from%20Ejection%20Fraction%20Values%20in%20Patients%20with%20Cardiovascular%20Disease.pdf)
+[(R Markdown zip)](https://github.com/user-attachments/files/18525574/MyFinal.Rmd.zip)
+
+This project was completed in R for my Categorical Data Analysis course (STAT 835) and investigates the relationship between a “death event” (0,1) and ejection fraction for patients at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan) during April–December 2015 while controlling for other potential sources of variation.
 
 [Predicting Prostate Specific Antigen Levels from Prognostic Clinical Measurements in Men with Advanced Prostate Cancer](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20PSA%20Levels%20from%20Prognostic%20Clinical%20Measurements%20in%20Men%20with%20Advanced%20Prostate%20Cancer%20(R%20code))
 [Final Project Paper](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20PSA%20Levels%20from%20Prognostic%20Clinical%20Measurements%20in%20Men%20with%20Advanced%20Prostate%20Cancer.pdf)
@@ -42,19 +51,12 @@ This project was completed in R for my Linear Regression course (STAT 840) and i
 
 This project was completed in R for my Introduction to Programming and Applied Statistics course (STAT 823) and performs statistical linear modeling to determine if there is an association between prostate-specific antigen (PSA level) and prognostic clinical measurements in men with advanced prostate cancer. 
 
-[Predicting a Death Event from Ejection Fraction Values in Patients with Cardiovascular Diseases](https://github.com/lindseyh251/KUMedPortfolio/blob/94005eaa2b95a1fa0a9432c676e9baf80ac6b742/Predicting%20a%20Death%20Event%20from%20Ejection%20Fraction%20Values%20in%20Patients%20with%20Cardiovascular%20Disease%20(R%20code))
-[Final Project Paper](https://github.com/lindseyh251/KUMedPortfolio/blob/94005eaa2b95a1fa0a9432c676e9baf80ac6b742/Predicting%20a%20Death%20Event%20from%20Ejection%20Fraction%20Values%20in%20Patients%20with%20Cardiovascular%20Disease.pdf)
-[(R Markdown zip)](https://github.com/user-attachments/files/18525574/MyFinal.Rmd.zip)
+[Predicting Life Expectancy of Different Countries from Gross Domestic Product](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20Life%20Expectancy%20of%20Different%20Countries%20from%20Gross%20Domestic%20Product%20(R%20code))
+[Final Project Paper](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20Life%20Expectancy%20of%20Different%20Countries%20from%20Gross%20Domestic%20Product.pdf)
 
-This project was completed in R for my Categorical Data Analysis course (STAT 835) and investigates the relationship between a “death event” (0,1) and ejection fraction for patients at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan) during April–December 2015 while controlling for other potential sources of variation.
+This project was completed in R for my Linear Regression course (STAT 840) and investigates the relationship between GDP and life expectancy across different countries between 2000 and 2015 while controlling for other potential sources of variation. 
 
-[Predicting Presence at March Madness Tournament 2024](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/84192183ebe2db30f0bdb03f61f3e8437c26a7a0/my_projects/march_madness_projects/march_madness_2024.R)
 
-This is a logistic regression analysis to predict if a team will make it to the March Madness Tournament based on team statistics such as Pre-Tournament.AdjTempo, Pre-Tournament.AdjOE, Pre-Tournament.AdjDE, Pre-Tournament.AdjEM, AvgHeight, and Experience. I used cross-validation to prevent overfitting and calculated AUC/ROC graph, and a confusion matrix to visualize accuracy and precision (AUC = 0.9 and PPV = 0.75). 
-
-[Profiling Royals Hitters using Classification and Principal Components (2024 season)](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/9c80ab2940fe699ebb6a92f7d3bfcf3dcc4f10d3/my_projects/royals_hitters)
-
-This is a k-means classification analysis of the Royals hitters from the 2024 season (with AB>25) based on variables such as Age, BB, SO, HR, SB, CS, X2B, X3B, PA, AB, HBP, GDP, BB_rate = BB / PA, SO_rate = SO / PA, HR_rate = HR / PA, XBH = X2B + X3B + HR, XBH_rate = XBH / PA,SB_success = SB / (SB + CS). This project using principal component analysis (PCA) and classified the players into three clusters which are visualized here: [Royals Hitting PCA Chart](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/a9b2b8255321110a0efde6eb4667681dff8570b4/my_projects/royals_hitters/profiling_royals_hitters_PC_chart.pdf)
 
 ## Python Projects ##
 [Final CNN Project](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/cnn_project/FinalCNN.py)
