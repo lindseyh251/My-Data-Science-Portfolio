@@ -23,15 +23,14 @@ This repository showcases the advanced projects and analyses I have completed du
 - STAT 823: Introduction to Programming and Applied Statistics in R 
 
 ## Table of Contents ## 
-- [Linear Regression Projects](#linear-regression-project)
-- [Categorical Data Analysis Projects](#categorical-data-analysis-project)
+- [R Projects](#r-projects)
 - [Python Projects](#python-project)
 - [Data Visualization Projects (Tableau and RShiny)](#tableau-project)
 
 
 
 
-## Linear Regression Modeling Projects ## 
+## R Projects ## 
 [Predicting Life Expectancy of Different Countries from Gross Domestic Product](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20Life%20Expectancy%20of%20Different%20Countries%20from%20Gross%20Domestic%20Product%20(R%20code))
 [Final Project Paper](https://github.com/lindseyh251/KUMedPortfolio/blob/6d5e55c1d7833f733cd57e92bb387bbbadc148de/Predicting%20Life%20Expectancy%20of%20Different%20Countries%20from%20Gross%20Domestic%20Product.pdf)
 
@@ -45,13 +44,14 @@ This project was completed in R for my Linear Regression course (STAT 840) and i
 
 This project was completed in R for my Introduction to Programming and Applied Statistics course (STAT 823) and performs statistical linear modeling to determine if there is an association between prostate-specific antigen (PSA level) and prognostic clinical measurements in men with advanced prostate cancer. 
 
-
-## Categorical Data Analysis Project ## 
 [Predicting a Death Event from Ejection Fraction Values in Patients with Cardiovascular Diseases](https://github.com/lindseyh251/KUMedPortfolio/blob/94005eaa2b95a1fa0a9432c676e9baf80ac6b742/Predicting%20a%20Death%20Event%20from%20Ejection%20Fraction%20Values%20in%20Patients%20with%20Cardiovascular%20Disease%20(R%20code))
 [Final Project Paper](https://github.com/lindseyh251/KUMedPortfolio/blob/94005eaa2b95a1fa0a9432c676e9baf80ac6b742/Predicting%20a%20Death%20Event%20from%20Ejection%20Fraction%20Values%20in%20Patients%20with%20Cardiovascular%20Disease.pdf)
 [(R Markdown zip)](https://github.com/user-attachments/files/18525574/MyFinal.Rmd.zip)
 
 This project was completed in R for my Categorical Data Analysis course (STAT 835) and investigates the relationship between a “death event” (0,1) and ejection fraction for patients at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan) during April–December 2015 while controlling for other potential sources of variation.
+
+
+
 
 ## Python Projects ##
 [Final CNN Project](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/cnn_project/FinalCNN.py)
