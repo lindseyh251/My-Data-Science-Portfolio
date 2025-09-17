@@ -50,7 +50,7 @@ This project was completed in R for my Introduction to Programming and Applied S
 
 This project was completed in R for my Categorical Data Analysis course (STAT 835) and investigates the relationship between a “death event” (0,1) and ejection fraction for patients at the Faisalabad Institute of Cardiology and at the Allied Hospital in Faisalabad (Punjab, Pakistan) during April–December 2015 while controlling for other potential sources of variation.
 
-[GDP Project] (https://github.com/lindseyh251/My-Data-Science_Portfolio/my-projects/GDP_project/blob)
+[GDP Project] (https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/690b6bba363783e7e05eb2eb5261e5d45a4c7651/my_projects/GDP_project)
 
 
 
