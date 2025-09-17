@@ -52,7 +52,7 @@ This project was completed in R for my Categorical Data Analysis course (STAT 83
 
 [Predicting Presence at March Madness Tournament 2024](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/84192183ebe2db30f0bdb03f61f3e8437c26a7a0/my_projects/march_madness_projects/march_madness_2024.R)
 
-
+This is a logistic regression analysis to predict if a team will make it to the March Madness Tournament based on team statistics such as Pre-Tournament.AdjTempo, Pre-Tournament.AdjOE, Pre-Tournament.AdjDE, Pre-Tournament.AdjEM, AvgHeight, and Experience. 
 
 ## Python Projects ##
 [Final CNN Project](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/cnn_project/FinalCNN.py)
