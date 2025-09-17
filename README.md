@@ -56,7 +56,7 @@ This is a logistic regression analysis to predict if a team will make it to the 
 
 [Profiling Royals Hitters using Classification and Principal Components (2024 season)](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/9c80ab2940fe699ebb6a92f7d3bfcf3dcc4f10d3/my_projects/royals_hitters)
 
-This is a k-means classification analysis of the Royals hitters from the 2024 season (with AB>25) based on variables such as Age, BB, SO, HR, SB, CS, X2B, X3B, PA, AB, HBP, GDP BB_rate = BB / PA, SO_rate = SO / PA, HR_rate = HR / PA, XBH = X2B + X3B + HR, XBH_rate = XBH / PA,SB_success = SB / (SB + CS). This project using principal component analysis (PCA) and classified the players into three clusters which are visualized here: [Royals Hitting PCA Chart](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/a9b2b8255321110a0efde6eb4667681dff8570b4/my_projects/royals_hitters/profiling_royals_hitters_PC_chart.pdf)
+This is a k-means classification analysis of the Royals hitters from the 2024 season (with AB>25) based on variables such as Age, BB, SO, HR, SB, CS, X2B, X3B, PA, AB, HBP, GDP, BB_rate = BB / PA, SO_rate = SO / PA, HR_rate = HR / PA, XBH = X2B + X3B + HR, XBH_rate = XBH / PA,SB_success = SB / (SB + CS). This project using principal component analysis (PCA) and classified the players into three clusters which are visualized here: [Royals Hitting PCA Chart](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/a9b2b8255321110a0efde6eb4667681dff8570b4/my_projects/royals_hitters/profiling_royals_hitters_PC_chart.pdf)
 
 ## Python Projects ##
 [Final CNN Project](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/cnn_project/FinalCNN.py)
