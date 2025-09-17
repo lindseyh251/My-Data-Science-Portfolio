@@ -54,6 +54,8 @@ This project was completed in R for my Categorical Data Analysis course (STAT 83
 
 This is a logistic regression analysis to predict if a team will make it to the March Madness Tournament based on team statistics such as Pre-Tournament.AdjTempo, Pre-Tournament.AdjOE, Pre-Tournament.AdjDE, Pre-Tournament.AdjEM, AvgHeight, and Experience. 
 
+(https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/9c80ab2940fe699ebb6a92f7d3bfcf3dcc4f10d3/my_projects/royals_hitters)
+
 ## Python Projects ##
 [Final CNN Project](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/cnn_project/FinalCNN.py)
 
