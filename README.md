@@ -3,7 +3,7 @@
 Hi, I'm Lindsey! I recently graduated with a Master's degree in applied statistics and data science at the University of Kansas Medical Center (KUMC). I also have a Bachelor's degree in Chemistry from Creighton University. This repository showcases the advanced projects and analyses I have completed during my courses and demonstrates my knowledge of statistical modeling, programming, and data science. 
 
 ## My Programming Languages ##
-- R  — statistical analysis, predictive modelling, and linear/logistic regression 
+- R  — statistical analysis, predictive modeling, and linear/logistic regression 
 - Python — Jupyter notebooks, TensorFlow, PyTorch, Pandas (for machine learning, data manipulation, and deep learning)
 - Tableau — interactive business intelligence analyses, data visualization, and reporting
 
