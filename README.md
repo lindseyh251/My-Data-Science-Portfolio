@@ -52,7 +52,7 @@ This project was completed in R for my Categorical Data Analysis course (STAT 83
 
 [Predicting Presence at March Madness Tournament 2024](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/84192183ebe2db30f0bdb03f61f3e8437c26a7a0/my_projects/march_madness_projects/march_madness_2024.R)
 
-This is a logistic regression analysis to predict if a team will make it to the March Madness Tournament based on team statistics such as Pre-Tournament.AdjTempo, Pre-Tournament.AdjOE, Pre-Tournament.AdjDE, Pre-Tournament.AdjEM, AvgHeight, and Experience. 
+This is a logistic regression analysis to predict if a team will make it to the March Madness Tournament based on team statistics such as Pre-Tournament.AdjTempo, Pre-Tournament.AdjOE, Pre-Tournament.AdjDE, Pre-Tournament.AdjEM, AvgHeight, and Experience. I used cross-validation to prevent overfitting and calculated AUC/ROC graph, and a confusion matrix to visualize accuracy and precision (AUC = 0.9 and PPV = 0.75). 
 
 [Profiling Royals Hitters using Classification and Principal Components (2024 season)](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/9c80ab2940fe699ebb6a92f7d3bfcf3dcc4f10d3/my_projects/royals_hitters)
 
