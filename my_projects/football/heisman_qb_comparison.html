@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heisman QB Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --dark: #0A0A0F;
+    --panel: #13141A;
+    --panel2: #1C1D26;
+    --border: #2A2B38;
+    --text: #F0F0F5;
+    --muted: #6B6C80;
+    --mendoza: #FFD700;
+    --bar-bg: #252635;
+  }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  .header {
+    margin-bottom: 36px;
+  }
+
+  .header-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .header h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .header h1 span {
+    color: var(--gold);
+  }
+
+  .header-sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .header-rule {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+    margin: 14px 0;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-bottom: 32px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .legend-item.featured .legend-dot {
+    background: var(--mendoza);
+    box-shadow: 0 0 8px rgba(255,215,0,0.5);
+  }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .stats-grid.full { grid-template-columns: 1fr; }
+
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: 1fr; }
+  }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 22px;
+  }
+
+  .stat-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stat-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* BAR ROWS */
+  .bar-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 52px;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .bar-row:last-child { margin-bottom: 0; }
+
+  .bar-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bar-name.featured { color: var(--mendoza); }
+  .bar-name.other { color: #B0B0C0; }
+
+  .bar-track {
+    height: 18px;
+    background: var(--bar-bg);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .bar-fill.featured {
+    background: linear-gradient(90deg, #B8970A, var(--gold-light));
+    box-shadow: 0 0 12px rgba(201,168,76,0.3);
+  }
+
+  .bar-fill.other {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+  }
+
+  /* color variation per player */
+  .bar-fill[data-player="burrow"] { background: #3A6FA8; }
+  .bar-fill[data-player="jackson"] { background: #7B3FA0; }
+  .bar-fill[data-player="mayfield"] { background: #A03F3F; }
+  .bar-fill[data-player="murray"] { background: #2E8B57; }
+  .bar-fill[data-player="williams"] { background: #4A6F8A; }
+
+  .bar-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: right;
+    letter-spacing: 0.5px;
+  }
+
+  .bar-value.featured { color: var(--gold-light); }
+  .bar-value.other { color: #A0A0B0; }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+    margin: 8px 0 16px;
+  }
+
+  /* FOOTNOTE */
+  .footnote {
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footnote-text {
+    font-family: 'Barlow', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .footnote-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+
+  /* PLAYER COLOR DOTS FOR LEGEND */
+  .dot-burrow { background: #3A6FA8; }
+  .dot-jackson { background: #7B3FA0; }
+  .dot-mayfield { background: #A03F3F; }
+  .dot-murray { background: #2E8B57; }
+  .dot-williams { background: #4A6F8A; }
+  .dot-mendoza { background: var(--mendoza); }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-eyebrow">Heisman Trophy Season — Quarterback Comparison</div>
+    <h1>Mendoza <span>vs.</span> The Legends</h1>
+    <div class="header-rule"></div>
+    <div class="header-sub">How does Indiana's 2025 Heisman winner stack up against recent Heisman-winning QBs in their award seasons?</div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item featured">
+      <div class="legend-dot dot-mendoza"></div>
+      <span style="color: var(--mendoza); font-weight: 600;">Fernando Mendoza — Indiana, 2025</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot dot-burrow"></div>
+      <span>Joe Burrow — LSU, 2019</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot dot-jackson"></div>
+      <span>Lamar Jackson — Louisville, 2016</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot dot-mayfield"></div>
+      <span>Baker Mayfield — Oklahoma, 2017</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot dot-murray"></div>
+      <span>Kyler Murray — Oklahoma, 2018</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot dot-williams"></div>
+      <span>Caleb Williams — USC, 2022</span>
+    </div>
+  </div>
+
+  <!-- GRID: Comp% + TD/INT -->
+  <div class="stats-grid">
+
+    <!-- COMPLETION % -->
+    <div class="stat-card">
+      <div class="stat-label">Completion %</div>
+
+      <div class="bar-row">
+        <div class="bar-name featured">Mendoza</div>
+        <div class="bar-track"><div class="bar-fill featured" style="width:91.25%"></div></div>
+        <div class="bar-value featured">72.0%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Burrow</div>
+        <div class="bar-track"><div class="bar-fill" data-player="burrow" style="width:97%"></div></div>
+        <div class="bar-value other">76.3%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Jackson</div>
+        <div class="bar-track"><div class="bar-fill" data-player="jackson" style="width:74.6%"></div></div>
+        <div class="bar-value other">57.6%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Mayfield</div>
+        <div class="bar-track"><div class="bar-fill" data-player="mayfield" style="width:90.5%"></div></div>
+        <div class="bar-value other">70.5%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Murray</div>
+        <div class="bar-track"><div class="bar-fill" data-player="murray" style="width:90.5%"></div></div>
+        <div class="bar-value other">70.9%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">C. Williams</div>
+        <div class="bar-track"><div class="bar-fill" data-player="williams" style="width:85%"></div></div>
+        <div class="bar-value other">66.7%</div>
+      </div>
+    </div>
+
+    <!-- TD / INT RATIO -->
+    <div class="stat-card">
+      <div class="stat-label">TD / INT Ratio</div>
+
+      <div class="bar-row">
+        <div class="bar-name featured">Mendoza</div>
+        <div class="bar-track"><div class="bar-fill featured" style="width:80%"></div></div>
+        <div class="bar-value featured">6.8:1</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Burrow</div>
+        <div class="bar-track"><div class="bar-fill" data-player="burrow" style="width:100%"></div></div>
+        <div class="bar-value other">10.0:1</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Jackson</div>
+        <div class="bar-track"><div class="bar-fill" data-player="jackson" style="width:33%"></div></div>
+        <div class="bar-value other">3.3:1</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Mayfield</div>
+        <div class="bar-track"><div class="bar-fill" data-player="mayfield" style="width:82%"></div></div>
+        <div class="bar-value other">8.2:1</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Murray</div>
+        <div class="bar-track"><div class="bar-fill" data-player="murray" style="width:57%"></div></div>
+        <div class="bar-value other">5.7:1</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">C. Williams</div>
+        <div class="bar-track"><div class="bar-fill" data-player="williams" style="width:84%"></div></div>
+        <div class="bar-value other">8.4:1</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- GRID: YPA + Total TDs -->
+  <div class="stats-grid">
+
+    <!-- YARDS PER ATTEMPT -->
+    <div class="stat-card">
+      <div class="stat-label">Yards Per Attempt</div>
+
+      <div class="bar-row">
+        <div class="bar-name featured">Mendoza</div>
+        <div class="bar-track"><div class="bar-fill featured" style="width:79.3%"></div></div>
+        <div class="bar-value featured">9.3</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Burrow</div>
+        <div class="bar-track"><div class="bar-fill" data-player="burrow" style="width:93%"></div></div>
+        <div class="bar-value other">10.8</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Jackson</div>
+        <div class="bar-track"><div class="bar-fill" data-player="jackson" style="width:74%"></div></div>
+        <div class="bar-value other">8.9</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Mayfield</div>
+        <div class="bar-track"><div class="bar-fill" data-player="mayfield" style="width:98%"></div></div>
+        <div class="bar-value other">11.5</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Murray</div>
+        <div class="bar-track"><div class="bar-fill" data-player="murray" style="width:100%"></div></div>
+        <div class="bar-value other">11.6 ★</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">C. Williams</div>
+        <div class="bar-track"><div class="bar-fill" data-player="williams" style="width:77%"></div></div>
+        <div class="bar-value other">9.1</div>
+      </div>
+    </div>
+
+    <!-- TOTAL TOUCHDOWNS -->
+    <div class="stat-card">
+      <div class="stat-label">Passing Touchdowns</div>
+
+      <div class="bar-row">
+        <div class="bar-name featured">Mendoza</div>
+        <div class="bar-track"><div class="bar-fill featured" style="width:68.3%"></div></div>
+        <div class="bar-value featured">41</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Burrow</div>
+        <div class="bar-track"><div class="bar-fill" data-player="burrow" style="width:100%"></div></div>
+        <div class="bar-value other">60 ★</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Jackson</div>
+        <div class="bar-track"><div class="bar-fill" data-player="jackson" style="width:50%"></div></div>
+        <div class="bar-value other">30</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Mayfield</div>
+        <div class="bar-track"><div class="bar-fill" data-player="mayfield" style="width:71.7%"></div></div>
+        <div class="bar-value other">43</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Murray</div>
+        <div class="bar-track"><div class="bar-fill" data-player="murray" style="width:66.7%"></div></div>
+        <div class="bar-value other">40</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">C. Williams</div>
+        <div class="bar-track"><div class="bar-fill" data-player="williams" style="width:70%"></div></div>
+        <div class="bar-value other">42</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FULL WIDTH: Passer Rating -->
+  <div class="stats-grid full">
+    <div class="stat-card">
+      <div class="stat-label">Passer Rating (NCAA)</div>
+
+      <div class="bar-row">
+        <div class="bar-name featured">Mendoza — Indiana 2025</div>
+        <div class="bar-track"><div class="bar-fill featured" style="width:76.5%"></div></div>
+        <div class="bar-value featured">167.4</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Burrow — LSU 2019</div>
+        <div class="bar-track"><div class="bar-fill" data-player="burrow" style="width:92.2%"></div></div>
+        <div class="bar-value other">202.0 ★</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Jackson — Louisville 2016</div>
+        <div class="bar-track"><div class="bar-fill" data-player="jackson" style="width:55%"></div></div>
+        <div class="bar-value other">120.4</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Mayfield — Oklahoma 2017</div>
+        <div class="bar-track"><div class="bar-fill" data-player="mayfield" style="width:90.6%"></div></div>
+        <div class="bar-value other">198.9</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">Murray — Oklahoma 2018</div>
+        <div class="bar-track"><div class="bar-fill" data-player="murray" style="width:93.7%"></div></div>
+        <div class="bar-value other">205.7 ★</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name other">C. Williams — USC 2022</div>
+        <div class="bar-track"><div class="bar-fill" data-player="williams" style="width:76.6%"></div></div>
+        <div class="bar-value other">167.9</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTNOTE -->
+  <div class="footnote">
+    <div class="footnote-text">
+      ★ denotes NCAA record or top-2 all-time mark in category &nbsp;·&nbsp; All stats reflect Heisman-winning season only<br>
+      Jackson TD/INT ratio reflects passing only &nbsp;·&nbsp; Mendoza passer rating estimated from available stats
+    </div>
+    <div class="footnote-badge">Data via Heisman.com · ESPN · Sports Reference</div>
+  </div>
+
+</div>
+</body>
+</html>
