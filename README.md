@@ -29,6 +29,10 @@ Hi, I'm Lindsey! I recently graduated with a Master's degree in applied statisti
 
 
 ## R Projects ## 
+
+[Indiana Pacers Player Impact Analysis (2025 Season)] (https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/9c80ab2940fe699ebb6a92f7d3bfcf3dcc4f10d3/my_projects/nba) 
+The graph ranks Pacers players using an impact_score, which summarizes overall on-court contribution by combining production (points, assists, rebounds), efficiency (such as eFG% and shooting effectiveness), and per-minute impact into a single metric. Higher values indicate players who not only produce more but do so efficiently and translate their performance into stronger overall team impact relative to their playing time. In this visualization, players like Pascal Siakam and Tyrese Haliburton lead the team because they consistently contribute across multiple statistical categories while maintaining strong efficiency, resulting in the highest impact_score values. Lower or negative impact_score values reflect players whose production and efficiency are either limited or less effective in influencing team performance per minute, which is typical for bench or developmental roles with smaller or less efficient contributions.
+
 [Profiling Royals Hitters using Classification and Principal Components (2024 season)](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/9c80ab2940fe699ebb6a92f7d3bfcf3dcc4f10d3/my_projects/royals_hitters)
 
 This is a k-means classification analysis of the Royals hitters from the 2024 season (with AB>25) based on variables such as Age, BB, SO, HR, SB, CS, X2B, X3B, PA, AB, HBP, GDP, BB_rate = BB / PA, SO_rate = SO / PA, HR_rate = HR / PA, XBH = X2B + X3B + HR, XBH_rate = XBH / PA,SB_success = SB / (SB + CS). This project used principal component analysis (PCA) and classified the players into three clusters which are visualized here: [Royals Hitting PCA Chart](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/a9b2b8255321110a0efde6eb4667681dff8570b4/my_projects/royals_hitters/profiling_royals_hitters_PC_chart.pdf)
