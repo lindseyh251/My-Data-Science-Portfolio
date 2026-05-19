@@ -31,6 +31,7 @@ Hi, I'm Lindsey! I recently graduated with a Master's degree in applied statisti
 ## R Projects ## 
 
 [Indiana Pacers Player Impact Analysis (2025 Season)](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/af07c0acde79ec9f60ef2fe238db46765977d99f/my_projects/pacers)
+
 The graph ranks Pacers players using an impact_score, which summarizes overall on-court contribution by combining production (points, assists, rebounds), efficiency (such as eFG% and shooting effectiveness), and per-minute impact into a single metric. Higher values indicate players who not only produce more but do so efficiently and translate their performance into stronger overall team impact relative to their playing time. In this visualization, players like Pascal Siakam and Tyrese Haliburton lead the team because they consistently contribute across multiple statistical categories while maintaining strong efficiency, resulting in the highest impact_score values. Lower or negative impact_score values reflect players whose production and efficiency are either limited or less effective in influencing team performance per minute, which is typical for bench or developmental roles with smaller or less efficient contributions.
 
 [Profiling Royals Hitters using Classification and Principal Components (2024 season)](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/9c80ab2940fe699ebb6a92f7d3bfcf3dcc4f10d3/my_projects/royals_hitters)
