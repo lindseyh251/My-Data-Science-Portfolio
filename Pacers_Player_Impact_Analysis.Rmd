@@ -1,0 +1,130 @@
+---
+title: "Pacers Player Impact Analysis"
+author: "Lindsey Hornberger"
+date: "2026-05-14"
+output: html_document
+---
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+# load libraries 
+library(readr)
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(janitor)
+library(zoo)
+```
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# import data 
+setwd("/Users/lindseyhornberger/Desktop/My Fun Projects/nba")
+nba_player_data <- read.csv("traditional.csv") # player and player_id
+```
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# 2025 season data subset
+nba_player_2025 <- nba_player_data %>% filter(season == 2025)
+```
+
+## Exploratory Data Analysis (EDA)
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+glimpse(nba_player_2025)
+summary(nba_player_2025)
+
+colSums(is.na(nba_player_2025)) 
+```
+
+## Isolate Pacers data and create metric variables 
+```{r}
+pacers_2025 <- nba_player_2025 %>% filter(team == "IND") %>% clean_names()
+
+pacers_2025 <- pacers_2025 %>%
+  rename(plus_minus = x,
+    fg_pct = fg,
+    x3p_pct = x3p,
+    ft_pct = ft
+  )
+pacers_2025 <- pacers_2025 %>%
+  mutate(
+    efg = ifelse(fga == 0, NA, (fgm + 0.5 * x3pm) / fga),
+    ts = ifelse((fga + 0.44 * fta) == 0, NA, pts / (2 * (fga + 0.44 * fta))),
+    pm_per_min = ifelse(min == 0, NA, plus_minus / min)
+  )
+
+
+```
+
+## Create impact_score 
+```{r}
+pacers_2025 <- pacers_2025 %>%
+  mutate(
+    efg = ifelse(fga == 0, NA, (fgm + 0.5 * x3pm) / fga),
+    ts = ifelse((fga + 0.44 * fta) == 0, NA, pts / (2 * (fga + 0.44 * fta))),
+    pm_per_min = ifelse(min == 0, NA, plus_minus / min)
+  )
+
+player_impact <- pacers_2025 %>%
+  group_by(player) %>%
+  summarise(
+    games = n(),
+    mpg = mean(min, na.rm = TRUE),
+    ppg = mean(pts, na.rm = TRUE),
+    apg = mean(ast, na.rm = TRUE),
+    rpg = mean(reb, na.rm = TRUE),
+    efg = mean(efg, na.rm = TRUE),
+    pm_per_min = mean(pm_per_min, na.rm = TRUE)
+  ) %>%
+  filter(games >= 10, mpg >= 10)
+  
+player_impact
+
+safe_scale <- function(x) {
+  if (sd(x, na.rm = TRUE) == 0) return(rep(0, length(x)))
+  (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+}
+
+player_impact <- player_impact %>%
+  mutate(
+    impact_score = 
+      safe_scale(ppg) * 0.25 +
+      safe_scale(apg) * 0.20 +
+      safe_scale(rpg) * 0.15 +
+      safe_scale(efg) * 0.15 +
+      safe_scale(pm_per_min) * 0.25
+  ) %>%
+  arrange(desc(impact_score))
+
+player_impact
+```
+
+## Visualize impact_score with ggplot
+```{r}
+ggplot(player_impact, aes(x = ppg, y = pm_per_min)) +
+geom_point(aes(size = impact_score), color = "#FDBB30", alpha = 0.6) +  
+ geom_text(aes(label = player), hjust = 1.1, size = 3) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_vline(xintercept = mean(player_impact$ppg), 
+             linetype = "dashed", color = "gray50") +
+  labs(
+    title = "Indiana Pacers 2025: Scoring vs On-Court Impact",
+    subtitle = "Players in top-right quadrant contribute most to winning",
+    x = "Points Per Game",
+    y = "+/- Per Minute" ) +
+    coord_cartesian(xlim = c(0, 22), ylim = c(-0.2, 0.2)
+  ) + 
+  theme_minimal()
+```
+
+## Summary of findings 
+
+These results summarize each player’s performance using key variables—games (total appearances), **mpg** (minutes per game, indicating role and usage), **ppg**, **apg**, and **rpg** (core production stats), **efg** (shooting efficiency that accounts for three-point value), and **pm_per_min** (plus-minus scaled by playing time to estimate on-court impact). The **impact_score** combines these elements into a single metric that reflects how effectively a player contributes to team success per minute, balancing volume, efficiency, and overall influence. 
+
+**Pascal Siakam** and **Tyrese Haliburton** stand out with the highest impact scores (1.16 and 1.13 respectively), driven by strong scoring, playmaking, and positive per-minute impact, indicating they are the primary engines of team performance. Players like Myles Turner and Aaron Nesmith also show solid positive contributions with higher impact scores (0.597 and 0.526 respectively), while mid-tier players provide moderate value in more specialized or inconsistent roles. Lower or negative impact scores suggest that, despite some individual production, those players have less favorable overall on-court impact, which is common for bench or developmental players with smaller roles or lower efficiency.
+
+
+© Lindsey Hornberger 2026 
+
+
+
