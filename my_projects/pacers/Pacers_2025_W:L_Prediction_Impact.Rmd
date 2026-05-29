@@ -1,0 +1,336 @@
+---
+title: "Pacers_2025_W/L_Prediction_Impact"
+author: "Lindsey Hornberger"
+date: "2026-05-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include=FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(janitor)
+library(tidyr)
+library(caret)
+library(pROC)
+library(randomForest)
+library(zoo)
+```
+
+# 1. Data Preparation
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# import data 
+setwd("/Users/lindseyhornberger/Desktop/My Fun Projects/nba")
+nba_player_data <- read.csv("traditional.csv") # player and player_id
+
+# 2025 season data subset
+nba_player_2025 <- nba_player_data %>% filter(season == 2025)
+
+glimpse(nba_player_2025)
+summary(nba_player_2025)
+
+colSums(is.na(nba_player_2025)) 
+```
+
+
+```{r}
+pacers_2025 <- nba_player_2025 %>% filter(team == "IND") %>% clean_names()
+
+pacers_2025 <- pacers_2025 %>%
+  rename(plus_minus = x,
+    fg_pct = fg,
+    x3p_pct = x3p,
+    ft_pct = ft
+  )
+pacers_2025 <- pacers_2025 %>%
+  mutate(
+    efg = ifelse(fga == 0, NA, (fgm + 0.5 * x3pm) / fga),
+    ts = ifelse((fga + 0.44 * fta) == 0, NA, pts / (2 * (fga + 0.44 * fta))),
+    pm_per_min = ifelse(min == 0, NA, plus_minus / min)
+  )
+```
+
+
+# 2. Build Game-Level Impact Scores
+
+```{r}
+pacers_2025 <- pacers_2025 %>%
+  mutate(
+    efg = ifelse(fga == 0, NA, (fgm + 0.5 * x3pm) / fga),
+    ts = ifelse((fga + 0.44 * fta) == 0, NA, pts / (2 * (fga + 0.44 * fta))),
+    pm_per_min = ifelse(min == 0, NA, plus_minus / min)
+  )
+
+player_impact <- pacers_2025 %>%
+  group_by(player) %>%
+  summarise(
+    games = n(),
+    mpg = mean(min, na.rm = TRUE),
+    ppg = mean(pts, na.rm = TRUE),
+    apg = mean(ast, na.rm = TRUE),
+    rpg = mean(reb, na.rm = TRUE),
+    efg = mean(efg, na.rm = TRUE),
+    pm_per_min = mean(pm_per_min, na.rm = TRUE)
+  ) %>%
+  filter(games >= 10, mpg >= 10)
+  
+player_impact
+
+safe_scale <- function(x) {
+  if (sd(x, na.rm = TRUE) == 0) return(rep(0, length(x)))
+  (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+}
+
+player_impact <- player_impact %>%
+  mutate(
+    impact_score = 
+      safe_scale(ppg) * 0.25 +
+      safe_scale(apg) * 0.20 +
+      safe_scale(rpg) * 0.15 +
+      safe_scale(efg) * 0.15 +
+      safe_scale(pm_per_min) * 0.25
+  ) %>%
+  arrange(desc(impact_score))
+
+player_impact
+```
+
+```{r game-level-aggregation}
+# One row per game: average metrics across all players who appeared
+game_impact <- pacers_2025 %>%
+  group_by(gameid, date, win) %>%
+  summarise(
+    team_ppg        = mean(pts,        na.rm = TRUE),
+    team_apg        = mean(ast,        na.rm = TRUE),
+    team_rpg        = mean(reb,        na.rm = TRUE),
+    team_efg        = mean(efg,        na.rm = TRUE),
+    team_pm_per_min = mean(pm_per_min, na.rm = TRUE),
+    players_used    = n(),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    lineup_impact_score =
+      safe_scale(team_ppg)        * 0.25 +
+      safe_scale(team_apg)        * 0.20 +
+      safe_scale(team_rpg)        * 0.15 +
+      safe_scale(team_efg)        * 0.15 +
+      safe_scale(team_pm_per_min) * 0.25,
+    win     = as.integer(win),   # ensure numeric for rolling mean
+    win_fac = factor(ifelse(win == 1, "Win", "Loss"))  # factor for caret
+  )
+
+glimpse(game_impact)
+
+```
+
+# 3. Exploratory Look: Impact Score vs. Outcome
+
+```{r eda-density, fig.width=7, fig.height=4}
+ggplot(game_impact, aes(x = lineup_impact_score, fill = win_fac)) +
+  geom_density(alpha = 0.55) +
+  scale_fill_manual(values = c("Loss" = "#3A3A5C", "Win" = "#FDBB30")) +
+  labs(
+    title    = "Indiana Pacers 2025: Lineup Impact Score by Game Outcome",
+    subtitle = "Higher lineup impact scores associate with wins",
+    x        = "Lineup Impact Score",
+    y        = "Density",
+    fill     = "Outcome"
+  ) +
+  theme_minimal()
+```
+
+```{r eda-boxplot, fig.width=6, fig.height=4}
+ggplot(game_impact, aes(x = win_fac, y = lineup_impact_score, fill = win_fac)) +
+  geom_boxplot(alpha = 0.7, outlier.shape = 21) +
+  scale_fill_manual(values = c("Loss" = "#3A3A5C", "Win" = "#FDBB30")) +
+  labs(
+    title = "Lineup Impact Score Distribution: Wins vs. Losses",
+    x     = NULL,
+    y     = "Lineup Impact Score"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+---
+
+# 4. Train / Test Split
+
+```{r split}
+set.seed(42)
+
+train_idx  <- createDataPartition(game_impact$win_fac, p = 0.75, list = FALSE)
+train_data <- game_impact[train_idx, ]
+test_data  <- game_impact[-train_idx, ]
+
+cat("Training games:", nrow(train_data), "\n")
+cat("Test games:    ", nrow(test_data),  "\n")
+```
+
+---
+
+# 5. Model 1 — Logistic Regression
+
+```{r logistic}
+ctrl <- trainControl(
+  method          = "cv",
+  number          = 5,
+  classProbs      = TRUE,
+  summaryFunction = twoClassSummary,
+  savePredictions = "final"
+)
+
+logit_model <- train(
+  win_fac ~ lineup_impact_score + team_efg + team_pm_per_min + team_apg + team_rpg,
+  data      = train_data,
+  method    = "glm",
+  family    = "binomial",
+  trControl = ctrl,
+  metric    = "ROC"
+)
+
+summary(logit_model$finalModel)
+```
+
+```{r logistic-eval}
+logit_preds <- predict(logit_model, test_data)
+logit_probs <- predict(logit_model, test_data, type = "prob")[, "Win"]
+
+confusionMatrix(logit_preds, test_data$win_fac, positive = "Win")
+```
+
+---
+
+# 6. Model 2 — Random Forest
+
+```{r random-forest}
+rf_model <- train(
+  win_fac ~ lineup_impact_score + team_efg + team_pm_per_min + team_apg + team_rpg,
+  data       = train_data,
+  method     = "rf",
+  trControl  = ctrl,
+  metric     = "ROC",
+  importance = TRUE
+)
+
+rf_preds <- predict(rf_model, test_data)
+rf_probs <- predict(rf_model, test_data, type = "prob")[, "Win"]
+
+confusionMatrix(rf_preds, test_data$win_fac, positive = "Win")
+```
+
+```{r variable-importance, fig.width=6, fig.height=4}
+varImp(rf_model)$importance %>%
+  tibble::rownames_to_column("Feature") %>%
+  mutate(Overall = rowMeans(across(where(is.numeric)))) %>%
+  arrange(desc(Overall)) %>%
+  ggplot(aes(x = reorder(Feature, Overall), y = Overall)) +
+  geom_col(fill = "#FDBB30", alpha = 0.85) +
+  coord_flip() +
+  labs(
+    title = "Random Forest: Variable Importance",
+    x     = NULL,
+    y     = "Importance Score"
+  ) +
+  theme_minimal()
+```
+
+---
+
+# 7. ROC Curve Comparison
+
+```{r roc, fig.width=7, fig.height=5}
+roc_logit <- roc(test_data$win_fac, logit_probs, levels = c("Loss", "Win"))
+roc_rf    <- roc(test_data$win_fac, rf_probs,    levels = c("Loss", "Win"))
+
+bind_rows(
+  data.frame(
+    fpr   = 1 - roc_logit$specificities,
+    tpr   = roc_logit$sensitivities,
+    model = paste0("Logistic Regression (AUC = ", round(auc(roc_logit), 3), ")")
+  ),
+  data.frame(
+    fpr   = 1 - roc_rf$specificities,
+    tpr   = roc_rf$sensitivities,
+    model = paste0("Random Forest (AUC = ", round(auc(roc_rf), 3), ")")
+  )
+) %>%
+  ggplot(aes(x = fpr, y = tpr, color = model)) +
+  geom_line(linewidth = 1.1) +
+  geom_abline(linetype = "dashed", color = "gray60") +
+  scale_color_manual(values = c("#FDBB30", "#3A3A5C")) +
+  labs(
+    title    = "ROC Curve: Logistic Regression vs. Random Forest",
+    subtitle = "Higher AUC indicates better discriminative ability",
+    x        = "False Positive Rate",
+    y        = "True Positive Rate",
+    color    = NULL
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+---
+
+# 8. Predicted Win Probability vs. Actual Outcomes — Season View
+
+```{r season-plot, fig.width=9, fig.height=4}
+game_impact %>%
+  mutate(
+    predicted_win_prob = predict(logit_model, game_impact, type = "prob")[, "Win"],
+    game_number        = row_number(),
+    rolling_win_pct    = rollmean(win, k = 10, fill = NA, align = "right")
+  ) %>%
+  ggplot(aes(x = game_number)) +
+  geom_line(aes(y = predicted_win_prob, color = "Predicted Win Prob"),
+            linewidth = 0.8, alpha = 0.8) +
+  geom_line(aes(y = rolling_win_pct, color = "Actual Win % (10-game rolling)"),
+            linewidth = 1.1, na.rm = TRUE) +
+  geom_point(aes(y = win, color = "Actual Outcome"),
+             alpha = 0.25, size = 1.5) +
+  scale_color_manual(values = c(
+    "Predicted Win Prob"             = "#FDBB30",
+    "Actual Win % (10-game rolling)" = "#3A3A5C",
+    "Actual Outcome"                 = "gray60"
+  )) +
+  scale_y_continuous(labels = scales::percent_format(), limits = c(0, 1)) +
+  labs(
+    title    = "Indiana Pacers 2025: Predicted Win Probability vs. Actual Outcomes",
+    subtitle = "Logistic regression model trained on lineup-level impact scores",
+    x        = "Game Number",
+    y        = "Win Probability",
+    color    = NULL
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+---
+
+# 9. Summary
+
+```{r summary-table, message=FALSE, warning=FALSE}
+data.frame(
+  Model    = c("Logistic Regression", "Random Forest"),
+  AUC      = c(round(auc(roc_logit), 3), round(auc(roc_rf), 3)),
+  Accuracy = c(
+    paste0(round(confusionMatrix(logit_preds, test_data$win_fac)$overall["Accuracy"] * 100, 1), "%"),
+    paste0(round(confusionMatrix(rf_preds,    test_data$win_fac)$overall["Accuracy"] * 100, 1), "%")
+  )
+) %>%
+  knitr::kable(caption = "Model Performance Comparison")
+```
+
+Lineup-level impact scores derived from eFG%, true shooting, assist rate, rebounding, and plus/minus per minute show meaningful predictive signal for game outcomes. Both models achieved an AUC of 0.70 — correctly ranking a win above a loss 70% of the time, well above the 0.50 baseline expected from random chance.
+Logistic Regression achieved 65.4% accuracy (sensitivity: 56.3%, specificity: 80.0%). The strongest individual predictor was team_pm_per_min (p = 0.047), the only statistically significant coefficient — reinforcing that on-court plus/minus per minute is the most direct signal of lineup effectiveness. The lineup_impact_score trended positive (estimate: 3.10) but did not reach significance on its own, likely due to collinearity with its component metrics included in the same model.
+Random Forest achieved 65.4% accuracy (sensitivity: 62.5%, specificity: 70.0%), matching logistic regression on overall accuracy while showing slightly better sensitivity — identifying a higher share of actual wins. The variable importance chart reinforces the logistic regression findings: team_pm_per_min ranked first (100) and lineup_impact_score second (78), with team_apg, team_rpg, and team_efg contributing minimally. This convergence across both models strengthens confidence that plus/minus per minute is the dominant signal for predicting wins.
+Season-long view: The predicted win probability chart tracks the Pacers' actual rolling win percentage reasonably well across 105 games. The model correctly assigns elevated win probability during the team's strongest stretch (games 50–85), where the 10-game rolling win rate peaked above 75%, and lower probability during losing streaks. Game-to-game predictions are volatile — expected given that box-score metrics swing widely night to night — but the directional trend aligns with actual team performance across the season.
+Limitations and next steps: The model is built solely from the Pacers' own box-score metrics with no opponent context. Adding opponent defensive rating or strength of schedule would likely improve AUC further. A natural extension would be to track impact score game-by-game across the season to identify performance trends and test whether early-season scores predict late-season outcomes.
+
+
+© Lindsey Hornberger 2026
