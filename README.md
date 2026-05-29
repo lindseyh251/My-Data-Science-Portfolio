@@ -23,7 +23,7 @@ Hi, I'm Lindsey! I recently graduated with a Master's degree in applied statisti
 ## Table of Contents ## 
 - [R Projects](#r-projects)
 - [Python Projects](#python-projects)
-- [Data Visualization Projects (Tableau and RShiny)](#data-visualization-projects-(tableau-and-rshiny)
+- [Data Visualization Projects](#data-visualization-projects)
 
 
 
@@ -78,7 +78,7 @@ This project was for my STAT 882 course in which I built a convolutional neural 
 This archery scoring game was completed during an undergraduate python course competition.
 
 
-## Data Visualization Projects (Tableau and RShiny) ##
+## Data Visualization Projects ##
 [Insurance Dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/insurance_project/InsuranceDashboard.twbx)
 [Screenshot of dashboard](https://github.com/lindseyh251/KUMedPortfolio/blob/main/my_projects/insurance_project/InsuranceDashboard.png)
 
