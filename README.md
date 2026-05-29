@@ -23,7 +23,7 @@ Hi, I'm Lindsey! I recently graduated with a Master's degree in applied statisti
 ## Table of Contents ## 
 - [R Projects](#r-projects)
 - [Python Projects](#python-projects)
-- [Data Visualization Projects (Tableau and RShiny)](#tableau-project)
+- [Data Visualization Projects (Tableau and RShiny)](#data-visualization-projects-(tableau-and-rshiny)
 
 
 
