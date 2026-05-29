@@ -30,6 +30,10 @@ Hi, I'm Lindsey! I recently graduated with a Master's degree in applied statisti
 
 ## R Projects ## 
 
+Indiana Pacers 2025 — Player Impact & Win Probability Analysis (2025 Season) 
+Built a composite player impact score for the 2025 Indiana Pacers by engineering game-level efficiency metrics (eFG%, true shooting %, plus/minus per minute) from full-season box score data. Aggregated player-level scores to the lineup level and used them to train logistic regression and random forest models predicting game outcomes. Both models achieved an AUC of 0.70 against actual win/loss results across an 82-game season. Plus/minus per minute emerged as the strongest individual predictor across both models. Built in R using tidyverse, ggplot2, and caret.
+
+
 [Indiana Pacers Player Impact Analysis (2025 Season)](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/af07c0acde79ec9f60ef2fe238db46765977d99f/my_projects/pacers)
 
 The graph ranks Pacers players using an impact_score, which summarizes overall on-court contribution by combining production (points, assists, rebounds), efficiency (such as eFG% and shooting effectiveness), and per-minute impact into a single metric. Higher values indicate players who not only produce more but do so efficiently and translate their performance into stronger overall team impact relative to their playing time. In this visualization, players like Pascal Siakam and Tyrese Haliburton lead the team because they consistently contribute across multiple statistical categories while maintaining strong efficiency, resulting in the highest impact_score values. Lower or negative impact_score values reflect players whose production and efficiency are either limited or less effective in influencing team performance per minute, which is typical for bench or developmental roles with smaller or less efficient contributions.
