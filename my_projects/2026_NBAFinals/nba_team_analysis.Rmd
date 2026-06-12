@@ -1,0 +1,974 @@
+---
+title: "What Drives Winning in the Modern NBA? (2009–2025 Analysis)"
+author: "Lindsey Hornberger"
+date: "2026-05-29"
+output: html_document
+---
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# load libraries 
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(janitor)
+library(knitr)
+library(zoo)
+library(ggrepel)
+library(hoopR)
+library(kableExtra)
+library(ggimage)
+```
+
+---
+
+# Overview
+
+This analysis examines NBA team-level performance across the modern era
+(2009–2025), covering offensive output, defensive efficiency, and win percentage.
+Teams are grouped by conference and division to surface structural patterns in
+how different parts of the league have evolved over time. (**Data Source:** NBA team-level box score data (2009–2025))
+
+---
+
+## Key Insights 
+
+* **The NBA has undergone a structural offensive transformation.**
+  League scoring increased from 99.7 points per game in 2009 to over 113 by 2025, driven primarily by pace and shot selection changes.
+
+* **The three-point revolution is complete—and fully standardized.**
+  Three-point attempts more than doubled across all teams, with every division converging to nearly identical shot profiles by 2025.
+
+* **Shooting efficiency is a key driver of success, but not the only one.**
+  Effective field goal percentage shows a moderate correlation with winning (r ≈ 0.47), indicating that efficiency matters, but must be paired with defense and ball control.
+
+* **The Western Conference led early, but the league has balanced out.**
+  The West maintained a scoring and efficiency advantage for most of the 2010s, but by 2024–2025 both conferences have converged.
+
+* **Team identity has shifted from style-based to efficiency-based.**
+  Divisions no longer differ in *how* they play (e.g., three-point volume), but in *how well* they execute—particularly shooting efficiency.
+
+---
+
+# 1. Data, Metrics, and Methodology
+
+These metrics were selected to capture the core components of modern NBA offense: scoring volume, shot selection, and efficiency.
+
+```{r load-data, echo=FALSE, message=FALSE, warning=FALSE}
+setwd("/Users/lindseyhornberger/Desktop/My Fun Projects/nba")
+nba_team_data <- read.csv("team_traditional.csv")
+
+nba_team_data <- nba_team_data %>%
+  filter(season >= 2009) %>% 
+  mutate(date = as.Date(date), 
+  team = case_when(
+      team %in% c("New Orleans Hornets",
+                  "New Orleans Pelicans",
+                  "NOH",
+                  "NO") ~ "NOP",
+      team %in% "NJN" ~ "BKN",
+      TRUE ~ team))
+
+```
+
+```{r conference-division-map, echo=FALSE}
+conf_div <- tribble(
+  ~team, ~conference, ~division,
+  "ATL", "East", "Southeast",
+  "BOS", "East", "Atlantic",
+  "BKN", "East", "Atlantic",
+  "CHA", "East", "Southeast",
+  "CHH", "East", "Southeast",  # Charlotte Hornets original
+  "CHO", "East", "Southeast",
+  "CHI", "East", "Central",
+  "CLE", "East", "Central",
+  "DET", "East", "Central",
+  "IND", "East", "Central",
+  "MIA", "East", "Southeast",
+  "MIL", "East", "Central",
+  "NYK", "East", "Atlantic",
+  "ORL", "East", "Southeast",
+  "PHI", "East", "Atlantic",
+  "TOR", "East", "Atlantic",
+  "WAS", "East", "Southeast",
+  "DAL", "West", "Southwest",
+  "DEN", "West", "Northwest",
+  "GSW", "West", "Pacific",
+  "HOU", "West", "Southwest",
+  "LAC", "West", "Pacific",
+  "LAL", "West", "Pacific",
+  "MEM", "West", "Southwest",
+  "VAN", "West", "Southwest",
+  "MIN", "West", "Northwest",
+  "NOP", "West", "Southwest",
+  "NOK", "West", "Southwest",  # Hornets/Pelicans post-Katrina in OKC
+  "OKC", "West", "Northwest",
+  "SEA", "West", "Northwest",
+  "PHO", "West", "Pacific",
+  "PHX", "West", "Pacific",    # alternate Phoenix abbreviation
+  "POR", "West", "Northwest",
+  "SAC", "West", "Pacific",
+  "SAS", "West", "Southwest",
+  "UTA", "West", "Northwest",
+  "NJN", "East", "Atlantic",
+  "NOH", "West", "Southwest"
+)
+
+nba_team_data <- nba_team_data %>%
+  left_join(conf_div, by = "team") 
+
+
+```
+
+This analysis uses team-level NBA box score data spanning the 2009–2025 seasons. Game-level data is aggregated to the season level using per-game averages, allowing for consistent comparisons across teams and years.
+
+Teams are mapped to their respective conferences and divisions to enable group-level comparisons throughout the analysis.
+
+## Key Metrics
+
+To evaluate team performance, the analysis focuses on a set of variables that capture scoring, shot selection, and efficiency:
+
+* **Points per Game (PTS)**
+  Measures overall offensive output and serves as a baseline for league-wide scoring trends.
+
+* **Three-Point Attempts (3PA)**
+  Captures shot selection and the degree to which teams rely on perimeter offense.
+
+* **Effective Field Goal Percentage (eFG%)**
+  Adjusts for the added value of three-point shots, making it a more accurate measure of shooting efficiency than traditional field goal percentage.
+
+* **Assist-to-Turnover Ratio (AST/TOV)**
+  Reflects offensive discipline and playmaking efficiency, with higher values indicating better ball movement and decision-making.
+
+* **Win Percentage (Win%)**
+  Serves as the primary measure of team success.
+
+## Derived Metrics
+
+* **eFG%** = (FGM + 0.5 × 3PM) / FGA
+* **AST/TOV** = AST / TOV
+
+## Analytical Approach
+
+The analysis progresses in three stages:
+
+1. Examining **league-wide trends** to understand how the game has evolved
+2. Comparing **conferences and divisions** to identify structural differences
+3. Evaluating **relationships between performance metrics and winning**
+
+This approach connects how teams play to how successful they are.
+
+
+---
+
+# 2. Season-Level Team Averages
+
+**Table 1: Season-Level Team Averages (2009–2025)** *Team-level averages for each NBA season, aggregated from game-level data. Metrics include scoring (PTS), shooting efficiency (FG%, eFG%), shot volume (FGA, 3PA, FTA), rebounding (REB), playmaking (AST, AST/TOV), and defensive activity (STL, BLK). This table serves as the foundational dataset for all subsequent analyses.*
+
+```{r season-averages, echo=FALSE, message=FALSE, warning=FALSE}
+team_season <- nba_team_data %>%
+  group_by(team, season, conference, division) %>%
+  summarise(
+    games   = n(),
+    win_pct = mean(win,      na.rm = TRUE),
+    pts     = mean(PTS,      na.rm = TRUE),
+    fgm     = mean(FGM,      na.rm = TRUE),
+    fga     = mean(FGA,      na.rm = TRUE),
+    fg_pct  = mean(FG.,      na.rm = TRUE),
+    x3pm    = mean(X3PM,     na.rm = TRUE),
+    x3pa    = mean(X3PA,     na.rm = TRUE),
+    ftm     = mean(FTM,      na.rm = TRUE),
+    fta     = mean(FTA,      na.rm = TRUE),
+    oreb    = mean(OREB,     na.rm = TRUE),
+    dreb    = mean(DREB,     na.rm = TRUE),
+    reb     = mean(REB,      na.rm = TRUE),
+    ast     = mean(AST,      na.rm = TRUE),
+    tov     = mean(TOV,      na.rm = TRUE),
+    stl     = mean(STL,      na.rm = TRUE),
+    blk     = mean(BLK,      na.rm = TRUE),
+    pf      = mean(PF,       na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    efg     = (fgm + 0.5 * x3pm) / fga,
+    ast_tov = ast / tov
+  )
+
+league_by_season <- team_season %>%
+  group_by(season) %>%
+  summarise(
+    # Outcome
+    avg_win_pct = mean(win_pct, na.rm = TRUE),
+
+    # Scoring / Volume
+    avg_pts  = mean(pts, na.rm = TRUE),
+    avg_fga  = mean(fga, na.rm = TRUE),
+    avg_fgm  = mean(fgm, na.rm = TRUE),
+    avg_x3pa = mean(x3pa, na.rm = TRUE),
+    avg_x3pm = mean(x3pm, na.rm = TRUE),
+    avg_fta  = mean(fta, na.rm = TRUE),
+
+    # Efficiency / Playmaking
+    avg_fg_pct  = mean(fg_pct, na.rm = TRUE),
+    avg_efg     = mean(efg, na.rm = TRUE),
+    avg_ast     = mean(ast, na.rm = TRUE),
+    avg_tov     = mean(tov, na.rm = TRUE),
+    avg_ast_tov = mean(ast_tov, na.rm = TRUE),
+
+    # Defense / Physicality
+    avg_reb = mean(reb, na.rm = TRUE),
+    avg_oreb = mean(oreb, na.rm = TRUE),
+    avg_dreb = mean(dreb, na.rm = TRUE),
+    avg_stl = mean(stl, na.rm = TRUE),
+    avg_blk = mean(blk, na.rm = TRUE),
+    avg_pf  = mean(pf, na.rm = TRUE),
+
+    .groups = "drop"
+  )
+
+league_by_season %>%
+  select(
+    season,
+    avg_win_pct,
+    avg_pts, avg_x3pa, avg_efg,
+    avg_ast, avg_tov, avg_ast_tov,
+    avg_reb, avg_stl, avg_blk
+  ) %>%
+  mutate(
+    avg_win_pct = paste0(round(avg_win_pct * 100, 1), "%"),
+    avg_pts     = round(avg_pts, 1),
+    avg_x3pa    = round(avg_x3pa, 1),
+    avg_efg     = paste0(round(avg_efg * 100, 1), "%"),
+    avg_ast     = round(avg_ast, 1),
+    avg_tov     = round(avg_tov, 1),
+    avg_ast_tov = round(avg_ast_tov, 2),
+    avg_reb     = round(avg_reb, 1),
+    avg_stl     = round(avg_stl, 1),
+    avg_blk     = round(avg_blk, 1)
+  ) %>%
+  kable(
+    caption = "Full League Profile by Season (All Variables Used in Analysis, 2009–2025)",
+    col.names = c(
+      "Season", "Win%",
+      "PTS", "3PA", "eFG%",
+      "AST", "TOV", "AST/TOV",
+      "REB", "STL", "BLK"
+    )
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 12
+  )
+```
+
+---
+
+# 3. How has the NBA Offense Evolved? (2009–2025)
+
+To understand modern team success, we first examine how the league itself has evolved. Rather than focusing on individual teams, this section tracks league-wide trends in scoring, shot selection, and efficiency across time.
+
+```{r league-trends, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+library(tidyr)
+
+league_long <- league_by_season %>%
+  select(season, avg_pts, avg_x3pa, avg_efg, avg_ast, avg_tov) %>%
+  pivot_longer(
+    cols = -season,
+    names_to = "metric",
+    values_to = "value"
+  ) %>%
+  mutate(metric = recode(metric,
+    avg_pts  = "Points Per Game",
+    avg_x3pa = "3PT Attempts",
+    avg_efg  = "Effective FG%",
+    avg_ast  = "Assists",
+    avg_tov  = "Turnovers"
+  ))
+
+ggplot(league_long, aes(x = season, y = value)) +
+  geom_line(linewidth = 1.2, color = "#1A1A2E") +
+  facet_wrap(~ metric, scales = "free_y", ncol = 2) +
+  labs(
+    title = "League-Wide Offensive Evolution (2009–2025)",
+    x = "Season",
+    y = NULL
+  ) +
+  theme_minimal()
+
+```
+**Figure 1: League-Wide Offensive Evolution (2009–2025)** *League-wide trends in scoring, shot selection, and efficiency reveal the transformation of NBA offense over time. While points, three-point attempts, and eFG% rise sharply in the modern era, assists and turnovers show comparatively smaller changes, reflecting a shift toward faster, more efficient offensive systems.*
+
+
+```{r plot-scoring-trend, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+ggplot(league_by_season, aes(x = season, y = avg_pts)) +
+  geom_line(color = "#FDBB30", linewidth = 1.2) +
+  geom_point(color = "#FDBB30", size = 2) +
+  geom_smooth(method = "loess", se = TRUE, color = "#1A1A2E",
+              fill = "#1A1A2E", alpha = 0.15) +
+  labs(
+    title    = "NBA League-Wide Scoring Trend: 2009–2025",
+    subtitle = "Average points per game per team by season",
+    x        = "Season",
+    y        = "Avg Points Per Game"
+  ) +
+  theme_minimal()
+```
+
+**Figure 2: League-Wide Scoring Trend** *Average points per game across all 30 NBA franchises from 2009–2025, smoothed using a loess curve. Scoring reached a modern-era low of 95.9 points per game during the 2012 lockout-shortened season before a sustained upward trend beginning in 2015.*
+
+
+```{r plot-3pa-trend, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+ggplot(league_by_season, aes(x = season, y = avg_x3pa)) +
+  geom_line(color = "#FDBB30", linewidth = 1.2) +
+  geom_point(color = "#FDBB30", size = 2) +
+  geom_smooth(method = "loess", se = TRUE, color = "#1A1A2E",
+              fill = "#1A1A2E", alpha = 0.15) +
+  labs(
+    title    = "Three-Point Attempt Rate: 2009–2025",
+    subtitle = "The three-point revolution in context",
+    x        = "Season",
+    y        = "Avg 3PA Per Game"
+  ) +
+  theme_minimal()
+```
+
+**Figure 3: Three-Point Attempt Rate** *Average three-point attempts per game across all 30 NBA franchises from 2009–2025, smoothed using a loess curve. Attempts remained stable near 18 per game through 2014 before accelerating sharply, more than doubling to 37.4 by 2025.*
+
+
+```{r plot-efg-trend, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+ggplot(league_by_season, aes(x = season, y = avg_efg)) +
+  geom_line(color = "#FDBB30", linewidth = 1.2) +
+  geom_point(color = "#FDBB30", size = 2) +
+  geom_smooth(method = "loess", se = TRUE, color = "#1A1A2E",
+              fill = "#1A1A2E", alpha = 0.15) +
+  scale_y_continuous(labels = function(x) paste0(round(x * 100, 1), "%")) +
+  labs(
+    title    = "League-Wide Effective FG%: 2009–2025",
+    subtitle = "Shooting efficiency has risen alongside the three-point era",
+    x        = "Season",
+    y        = "Avg eFG%"
+  ) +
+  theme_minimal()
+```
+
+**Figure 4: League-Wide Effective Field Goal Percentage** *Average effective field goal percentage (eFG%) across all 30 NBA franchises from 2009–2025, smoothed using a loess curve. eFG% improved by 4.2 percentage points over the period, rising from 49.9% in 2009 to 54.1% in 2025.*
+
+The evolution of NBA offense between 2009 and 2025 is best understood as a coordinated shift across scoring, shot selection, and efficiency rather than a change in any single metric. League-wide scoring increased from **99.7 points per game in 2009 to over 113 by 2025**, a rise of more than 13 points. This growth closely mirrors the expansion of the three-point shot, with attempts more than doubling from **18.1 to 37.4 per game** over the same period.
+
+The timing of this transformation is especially revealing. From 2009 through 2014, the league remained relatively stable, with scoring hovering around 100 points and three-point attempts increasing only marginally. Beginning in 2015, however, offensive trends accelerated sharply. Within just four seasons, scoring surpassed **110 points per game**, while three-point volume jumped from **22.5 to over 32 attempts per game**, signaling a fundamental shift in offensive philosophy.
+
+Importantly, the rise in efficiency confirms that this was not simply an increase in shot volume, but an improvement in shot quality. Effective field goal percentage climbed from **49.9% in 2009 to over 54% by 2023–2025**, reflecting a league-wide move toward higher-value shots such as threes and attempts at the rim. This optimization of shot selection, combined with increased pace and spacing, produced the most efficient scoring environment in NBA history.
+
+Together, these trends illustrate a structural transformation in how the game is played. What began as a strategic advantage for a small number of teams evolved into a universal model, resulting in a faster, more efficient, and more analytically driven offensive landscape across the league.
+
+
+**Key Takeaways:**
+
+ * The NBA has undergone a **fundamental offensive transformation** since 2015, driven by pace-and-space principles.
+* **Three-point volume more than doubled** (18.1 → 37.4), reshaping shot selection across all teams.
+* Scoring increased by over **13 points per game**, reaching the highest levels in league history.
+* Efficiency gains followed, with **eFG% rising by ~4 percentage points**, reflecting smarter, more optimized offenses.
+* What began as a competitive advantage for a few teams has become a **league-wide standard**, resulting in a faster, more efficient, and more uniform style of play.
+
+---
+
+# 4. East vs. West: Closing the Gap
+
+While the NBA operates under a unified rule set, the Eastern and Western Conferences have historically developed distinct competitive identities. This section compares scoring, efficiency, and play style across conferences to evaluate whether those differences persist in the modern era.
+
+**Table 2: East vs. West Comparison (2009–2025)** *Average team-level performance by conference across the modern NBA era. Metrics include scoring (PTS), shooting efficiency (eFG%), three-point volume (3PA), and playmaking indicators (AST, TOV, AST/TOV).*
+
+```{r conference-by-season, echo=FALSE, message=FALSE, warning=FALSE}
+conf_by_season <- team_season %>%
+  filter(!is.na(conference)) %>%
+  group_by(season, conference) %>%
+  summarise(
+    avg_pts     = mean(pts,     na.rm = TRUE),
+    avg_win_pct = mean(win_pct, na.rm = TRUE),
+    avg_efg     = mean(efg,     na.rm = TRUE),
+    avg_x3pa    = mean(x3pa,    na.rm = TRUE),
+    avg_ast_tov = mean(ast_tov, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+conf_summary <- team_season %>%
+  group_by(conference) %>%
+  summarise(
+    seasons     = n(),
+    avg_win_pct = mean(win_pct, na.rm = TRUE),
+    avg_pts     = mean(pts, na.rm = TRUE),
+    avg_efg     = mean(efg, na.rm = TRUE),
+    avg_x3pa    = mean(x3pa, na.rm = TRUE),
+    avg_ast     = mean(ast, na.rm = TRUE),
+    avg_tov     = mean(tov, na.rm = TRUE),
+    avg_ast_tov = mean(ast_tov, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+conf_summary %>%
+  mutate(
+    avg_win_pct = paste0(round(avg_win_pct * 100, 1), "%"),
+    avg_efg     = paste0(round(avg_efg * 100, 1), "%"),
+    avg_pts     = round(avg_pts, 1),
+    avg_x3pa    = round(avg_x3pa, 1),
+    avg_ast     = round(avg_ast, 1),
+    avg_tov     = round(avg_tov, 1),
+    avg_ast_tov = round(avg_ast_tov, 2)
+  ) %>%
+  kable(
+    caption = "East vs. West Comparison (2009–2025 Averages)",
+    col.names = c(
+      "Conference", "Seasons", "Win%",
+      "PTS", "eFG%", "3PA",
+      "AST", "TOV", "AST/TOV"
+    )
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 13
+  )
+
+conf_summary %>%
+  mutate(
+    avg_win_pct = paste0(round(avg_win_pct * 100, 1), "%"),
+    avg_efg     = paste0(round(avg_efg * 100, 1), "%"),
+    avg_pts     = round(avg_pts, 1),
+    avg_x3pa    = round(avg_x3pa, 1),
+    avg_ast     = round(avg_ast, 1),
+    avg_tov     = round(avg_tov, 1),
+    avg_ast_tov = round(avg_ast_tov, 2)
+  ) %>%
+  kable(
+    caption = "East vs. West Comparison (2009–2025 Averages)",
+    col.names = c(
+      "Conference", "Seasons", "Win%",
+      "PTS", "eFG%", "3PA",
+      "AST", "TOV", "AST/TOV"
+    )
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 13
+  )
+```
+
+```{r plot-conf-pts, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+ggplot(conf_by_season, aes(x = season, y = avg_pts, color = conference)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 1.5) +
+  scale_color_manual(values = c("East" = "#1A1A2E", "West" = "#FDBB30")) +
+  labs(
+    title = "Average Points Per Game: East vs. West (2009–2025)",
+    x     = "Season",
+    y     = "Avg Points Per Game",
+    color = "Conference"
+  ) +
+  theme_minimal()
+```
+
+**Figure 5: Average Points Per Game by Conference** *Average points per game by conference from 2009–2025. The Western Conference consistently outscored the Eastern Conference throughout the period, though the gap narrowed significantly by 2024–2025.*
+
+
+
+```{r plot-conf-efg, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+ggplot(conf_by_season, aes(x = season, y = avg_efg, color = conference)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 1.5) +
+  scale_color_manual(values = c("East" = "#1A1A2E", "West" = "#FDBB30")) +
+  scale_y_continuous(labels = function(x) paste0(round(x * 100, 1), "%")) +
+  labs(
+    title = "Effective FG%: East vs. West (2009–2025)",
+    x     = "Season",
+    y     = "Avg eFG%",
+    color = "Conference"
+  ) +
+  theme_minimal()
+```
+
+**Figure 6: Effective Field Goal Percentage by Conference** *Average eFG% by conference from 2009–2025. The West maintained a slight efficiency advantage for most of the period, with both conferences reaching above 54% by 2025.*
+
+At a high level, the Western Conference has maintained a modest but consistent advantage across most offensive metrics. From 2009–2025, the West averaged **106.7 points per game** compared to **104.2** in the East, alongside a slightly higher **effective field goal percentage (51.9% vs. 51.1%)** and marginally greater **three-point volume (27.2 vs. 26.9 attempts per game).** While these differences are not extreme, they are remarkably persistent across the full time horizon.
+
+This gap is also reflected in overall success rates. Western Conference teams posted an average **win percentage of 50.7%**, compared to **47.4%** in the East. Although inter-conference scheduling plays a role, the consistency of this difference suggests a deeper structural edge in team quality and offensive execution throughout much of the modern era.
+
+From a stylistic perspective, however, the two conferences are nearly identical. Assist totals **(23.3 vs. 22.9)** and turnover rates **(14.3 vs. 14.1)** are closely aligned, resulting in virtually indistinguishable **assist-to-turnover ratios (1.65 vs. 1.64)**. This indicates that while the West has been slightly more efficient, both conferences operate within the same underlying offensive framework.
+
+The most important trend is convergence. Earlier in the dataset, the Western Conference held clearer advantages in both scoring and efficiency, driven in part by early adoption of three-point-oriented offensive systems. Over time, these innovations diffused across the league, and by the early 2020s the gap had narrowed substantially. Both conferences now operate at similar efficiency levels and scoring environments, reflecting a fully modernized, league-wide style of play.
+
+
+
+
+**Key Takeaway:**
+
+While the Western Conference maintained a small offensive edge over the 2009–2025 period, differences between conferences have largely diminished. In today’s NBA, success is driven less by conference identity and more by execution within a shared, efficiency-driven offensive system.
+
+
+
+
+---
+
+# 5. Which Divisions Are Actually Winning? (2025)
+
+Zooming in from conferences to divisions provides a more granular view of competitive balance. This section examines team performance in the most recent season, identifying which divisions are driving success—and which are falling behind.
+
+**Table 3: Division Averages — 2025 Season** *Average win percentage, points per game, effective field goal percentage, three-point attempts, rebounds, assists, turnovers, steals, and blocks per game for each division in the 2025 season.*
+```{r division-recent, echo=FALSE, message=FALSE, warning=FALSE}
+recent_season <- max(team_season$season, na.rm = TRUE)
+
+div_recent <- team_season %>%
+  filter(season == recent_season, !is.na(division)) %>%
+  group_by(conference, division) %>%
+  summarise(
+    avg_win_pct = mean(win_pct, na.rm = TRUE),
+    avg_pts     = mean(pts,     na.rm = TRUE),
+    avg_efg     = mean(efg,     na.rm = TRUE),
+    avg_x3pa    = mean(x3pa,    na.rm = TRUE),
+    avg_reb     = mean(reb,     na.rm = TRUE),
+    avg_ast     = mean(ast,     na.rm = TRUE),
+    avg_tov     = mean(tov,     na.rm = TRUE),
+    avg_stl     = mean(stl,     na.rm = TRUE),
+    avg_blk     = mean(blk,     na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(conference, desc(avg_win_pct))
+
+kable(div_recent %>%
+  mutate(
+    avg_win_pct = paste0(round(avg_win_pct * 100, 1), "%"),
+    avg_pts     = round(avg_pts,  1),
+    avg_efg     = paste0(round(avg_efg * 100, 1), "%"),
+    avg_x3pa    = round(avg_x3pa, 1),
+    avg_reb     = round(avg_reb,  1),
+    avg_ast     = round(avg_ast,  1),
+    avg_tov     = round(avg_tov,  1),
+    avg_stl     = round(avg_stl,  1),
+    avg_blk     = round(avg_blk,  1)
+  ),
+  caption = paste("Division Averages —", recent_season, "Season"),
+  col.names = c("Conference", "Division", "Win%", "PTS", "eFG%",
+                "3PA", "REB", "AST", "TOV", "STL", "BLK")
+)
+```
+
+
+```{r plot-division-winpct, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+# Build alltime with logos in one pipeline
+teams <- hoopR::espn_nba_teams() %>%
+  select(abbreviation, display_name, logo) %>%
+  mutate(abbreviation = case_when(
+    abbreviation == "GS"   ~ "GSW",
+    abbreviation == "NO"   ~ "NOP",
+    abbreviation == "NY"   ~ "NYK",
+    abbreviation == "SA"   ~ "SAS",
+    abbreviation == "UTAH" ~ "UTA",
+    abbreviation == "WSH"  ~ "WAS",
+    TRUE ~ abbreviation
+  ))
+
+alltime <- team_season %>%
+  filter(!is.na(conference)) %>%
+  group_by(team, conference, division) %>%
+  summarise(
+    seasons     = n(),
+    avg_win_pct = mean(win_pct, na.rm = TRUE),
+    avg_pts     = mean(pts,     na.rm = TRUE),
+    avg_efg     = mean(efg,     na.rm = TRUE),
+    avg_x3pa    = mean(x3pa,    na.rm = TRUE),
+    avg_reb     = mean(reb,     na.rm = TRUE),
+    avg_ast     = mean(ast,     na.rm = TRUE),
+    avg_tov     = mean(tov,     na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(conference, division, desc(avg_win_pct)) %>%
+  left_join(teams, by = c("team" = "abbreviation"))
+
+
+
+div_team_logos <- alltime %>%
+  filter(!is.na(division)) %>%
+  select(division, team, logo, avg_win_pct) %>%
+  left_join(div_recent %>% select(division, avg_win_pct) %>% 
+              rename(div_win_pct = avg_win_pct), by = "division") %>%
+  group_by(division) %>%
+  mutate(
+    n       = n(),
+    spacing = div_win_pct / (n + 1),
+    y_pos   = spacing * row_number()
+  ) %>%
+  ungroup()
+
+div_recent %>%
+  ggplot(aes(x = reorder(division, avg_win_pct),
+             y = avg_win_pct, fill = conference)) +
+  geom_col(alpha = 0.9, width = 0.7) +
+  geom_hline(yintercept = 0.5, linetype = "dashed",
+             color = "gray50", linewidth = 0.6) +
+  annotate("text", x = 0.4, y = 0.51,
+           label = ".500", size = 3, color = "gray50", hjust = 0) +
+  # logos spaced evenly along each bar
+  geom_image(data = div_team_logos,
+             aes(x = reorder(division, div_win_pct),
+                 y = y_pos, image = logo),
+             size = 0.06, asp = 1.8,
+             inherit.aes = FALSE) +
+  # division name to the left of the bar
+  geom_text(aes(label = division, y = -0.01),
+            hjust = 1, size = 3.5, fontface = "bold", color = "gray30") +
+  geom_text(aes(label = paste0(round(avg_win_pct * 100, 1), "%")),
+            hjust = -0.2, size = 3.8, fontface = "bold") +
+  coord_flip() +
+  scale_fill_manual(values = c("East" = "#1A1A2E", "West" = "#FDBB30")) +
+  scale_y_continuous(labels = function(x) paste0(round(x * 100, 0), "%"),
+                     limits = c(-0.15, 0.78)) +
+  labs(
+    title    = paste("Win% by Division —", recent_season, "Season"),
+    subtitle = "Dashed line represents .500 win percentage",
+    x        = NULL,
+    y        = "Average Win %",
+    fill     = "Conference"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y        = element_blank(),
+    axis.ticks.y       = element_blank(),
+    panel.grid.major.y = element_blank(),
+    plot.title         = element_text(face = "bold", size = 14),
+    plot.subtitle      = element_text(color = "gray50", size = 10),
+    legend.position    = "bottom"
+  )
+
+```
+
+**Figure 7: Win Percentage by Division — 2025 Season** *Average win percentage by division for the 2025 season. The Eastern Central division led all divisions at 58.7%, while the Eastern Southeast was the weakest at 37.2%.*
+
+The 2025 division standings reveal a clear hierarchy within each conference. In the East, the **Central Division** stands apart from the rest with a **58.7% win rate**, leading the league in scoring (117.2 points), eFG% (56.0%), and assists (27.3) — reflecting the strong seasons from Cleveland and Indiana. The **Atlantic Division** sits in the middle at 46.1%, while the **Southeast Division** is the weakest in basketball at **37.2% win rate**, with the lowest scoring (109.2) and efficiency (52.2%).
+
+In the West, the divisions are more tightly bunched. The **Pacific Division** leads at **53.4% win rate** with strong efficiency (55.0% eFG%), while the **Northwest Division** is close behind at 52.8%, driven by elite rebounding (44.9) and rim protection (5.0 blocks). The **Southwest Division** has slipped to 46.4%, though it still leads the league in physical play (45.1 rebounds, 5.4 blocks).
+
+A few cross-division patterns stand out. Turnovers are remarkably consistent league-wide, ranging narrowly from 13.9 to 14.8 — suggesting ball security has become a universal priority. Three-point attempts are similarly uniform (36–38 across all divisions), confirming that the **modern NBA operates within a fully standardized offensive system**. The biggest differentiator between winning and losing divisions in 2025 is not how many threes teams shoot, but how efficiently they convert them.
+
+**Key Takeaway:**
+
+While clear differences exist across divisions in 2025, the gap is driven more by execution than strategy. Across the league, teams now operate within a highly uniform system — similar three-point volume and turnover rates — meaning competitive separation comes down to how well teams convert opportunities. In today’s NBA, division strength is less about identity and more about efficiency at scale.
+
+---
+
+# 6. Do Winning Divisions Lean Offense or Defense?
+
+Winning can be driven by different team identities—elite offense, strong defense, or a balance of both. This section compares offensive efficiency and defensive activity across divisions to better understand how different profiles translate to success.
+
+```{r plot-off-def, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+div_recent %>%
+  mutate(def_proxy = avg_stl + avg_blk) %>%
+  left_join(div_team_logos %>% 
+              group_by(division) %>% 
+              slice_max(avg_win_pct, n = 1) %>% 
+              select(division, logo), 
+            by = "division") %>%
+  ggplot(aes(x = avg_efg, y = def_proxy, label = division)) +
+  geom_vline(xintercept = mean(div_recent$avg_efg), 
+             linetype = "dashed", color = "gray70", linewidth = 0.6) +
+  geom_hline(yintercept = mean(div_recent$avg_stl + div_recent$avg_blk), 
+             linetype = "dashed", color = "gray70", linewidth = 0.6) +
+  annotate("text", x = min(div_recent$avg_efg) + 0.001, 
+           y = max(div_recent$avg_stl + div_recent$avg_blk),
+           label = "Defensive", color = "gray60", size = 3, hjust = 0, fontface = "italic") +
+  annotate("text", x = max(div_recent$avg_efg) - 0.001, 
+           y = max(div_recent$avg_stl + div_recent$avg_blk),
+           label = "Two-Way", color = "gray60", size = 3, hjust = 1, fontface = "italic") +
+  annotate("text", x = min(div_recent$avg_efg) + 0.001, 
+           y = min(div_recent$avg_stl + div_recent$avg_blk),
+           label = "Neither", color = "gray60", size = 3, hjust = 0, fontface = "italic") +
+  annotate("text", x = max(div_recent$avg_efg) - 0.001, 
+           y = min(div_recent$avg_stl + div_recent$avg_blk),
+           label = "Offensive", color = "gray60", size = 3, hjust = 1, fontface = "italic") +
+  geom_image(aes(x = avg_efg, y = def_proxy, image = logo), 
+             size = 0.10, asp = 1.6) +
+  geom_text_repel(size = 3.8, fontface = "bold",
+                  nudge_y = 0.15,
+                  segment.color = "gray70") +
+  scale_x_continuous(labels = function(x) paste0(round(x * 100, 1), "%")) +
+  scale_y_continuous(limits = c(12.3, 14.0))+
+  labs(
+    title    = paste("Offensive vs. Defensive Profile by Division —", recent_season),
+    subtitle = "eFG% as offensive proxy; STL + BLK per game as defensive proxy\nDashed lines represent league averages",
+    x        = "Avg eFG% (Offense)",
+    y        = "Avg STL + BLK (Defense)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title      = element_text(face = "bold", size = 14),
+    plot.subtitle   = element_text(color = "gray50", size = 10),
+    legend.position = "none"
+  )
+```
+
+**Figure 8: Offensive vs. Defensive Profile by Division — 2025 Season** *Each point represents one division, plotted by average effective field goal percentage (offensive proxy) and average steals plus blocks per game (defensive proxy). Divisions in the upper-left quadrant generate high defensive activity relative to their offensive efficiency.*
+
+Plotting each division's offensive efficiency (eFG%) against a defensive proxy (steals plus blocks per game) reveals an interesting inverse relationship in 2025 — the divisions shooting most efficiently are not the same ones generating the most defensive activity.
+
+**Central division:**  leads the others in offensive efficiency at 56.0% eFG% but sits in the middle of the pack defensively at 12.7 steals plus blocks per game. These are high-efficiency, offensively dominant teams that win by outscoring opponents rather than disrupting them.
+
+**Pacific division:** similarly pairs strong offense (55.0% eFG%) with modest defensive disruption (12.8 steals plus blocks), the second highest offensive efficiency of any division but below average defensively — reflecting a collection of teams built around perimeter scoring and pace rather than defensive identity.
+
+**Northwest division:** presents a different profile — middle of the pack offensively (54.5% eFG%) but among the strongest defensively at 13.3 steals plus blocks per game, driven by the physical, switchable defenders in Denver and Oklahoma City.
+
+**Southwest division:** tells the most distinct story — the lowest eFG% among Western divisions (53.7%) but the highest defensive proxy in the league at 13.7. Memphis and San Antonio in particular have long built identities around defense-first basketball, and that shows up clearly here.
+
+**Southeast division:** in an awkward middle ground — below average offensively (52.2%) and middle of the pack defensively (13.2). It is the only division that lacks a clear identity in either direction, which largely explains its league-worst 37.2% win rate in 2025.
+
+**Atlantic division:** the most balanced and sits near the middle on both axes (53.4% eFG%, 12.6 defensive proxy) — a reflection of a division with teams at very different stages, from the elite Celtics to rebuilding franchises pulling the averages toward the center.
+
+**Key Takeaways:**
+
+- **Tier 1: Elite franchises** (Boston, Miami, Denver, OKC, San Antonio, Golden State) consistently combine high win rates with strong efficiency and long-term stability.  
+- **Tier 2: Competitive Core ** (Toronto, Indiana, Cleveland, Dallas, Memphis, Lakers, Clippers) remain competitive but fluctuate across roster cycles.  
+- **Tier 3: Rebuilding Teams** (Charlotte, Washington, Detroit, Sacramento, Minnesota) struggle with sustained success and frequent rebuilds.  
+- Team success is driven more by **organizational quality than conference or division alignment**.  
+- The NBA is increasingly a **tiered league structure rather than a geographic one**.  
+
+---
+
+# 7. All-Time Team Summary Table
+
+Single-season results can be volatile, so a longer view is necessary to identify sustained success. This section summarizes team performance across the entire modern era, highlighting franchises that have consistently outperformed their peers.
+
+**Table 4: All-Time Team Averages by Division (2009–2025)** *The all-time team summary across 2009–2025 captures how franchises have performed over the modern NBA era, spanning dynasties, rebuild cycles, and sustained mediocrity. The data highlights clear organizational tiers both within and across divisions.*
+```{r alltime-table, echo=FALSE, message=FALSE, warning=FALSE}
+# Fix hoopR abbreviations to match your data
+# Build alltime with logos in one pipeline
+teams <- hoopR::espn_nba_teams() %>%
+  select(abbreviation, display_name, logo) %>%
+  mutate(abbreviation = case_when(
+    abbreviation == "GS"   ~ "GSW",
+    abbreviation == "NO"   ~ "NOP",
+    abbreviation == "NY"   ~ "NYK",
+    abbreviation == "SA"   ~ "SAS",
+    abbreviation == "UTAH" ~ "UTA",
+    abbreviation == "WSH"  ~ "WAS",
+    TRUE ~ abbreviation
+  ))
+
+alltime <- team_season %>%
+  filter(!is.na(conference)) %>%
+  group_by(team, conference, division) %>%
+  summarise(
+    seasons     = n(),
+    avg_win_pct = mean(win_pct, na.rm = TRUE),
+    avg_pts     = mean(pts,     na.rm = TRUE),
+    avg_efg     = mean(efg,     na.rm = TRUE),
+    avg_x3pa    = mean(x3pa,    na.rm = TRUE),
+    avg_reb     = mean(reb,     na.rm = TRUE),
+    avg_ast     = mean(ast,     na.rm = TRUE),
+    avg_tov     = mean(tov,     na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(conference, division, desc(avg_win_pct)) %>%
+  left_join(teams, by = c("team" = "abbreviation"))
+
+# Build table immediately after
+library(kableExtra)
+
+alltime_fmt <- alltime %>%
+  mutate(
+    logo        = paste0('<img src="', logo, '" height="30">'),
+    avg_win_pct = paste0(round(avg_win_pct * 100, 1), "%"),
+    avg_pts     = round(avg_pts,  1),
+    avg_efg     = paste0(round(avg_efg * 100, 1), "%"),
+    avg_x3pa    = round(avg_x3pa, 1),
+    avg_reb     = round(avg_reb,  1),
+    avg_ast     = round(avg_ast,  1),
+    avg_tov     = round(avg_tov,  1)
+  ) %>%
+  select(conference, division, logo, display_name, seasons,
+         avg_win_pct, avg_pts, avg_efg, avg_x3pa, avg_reb, avg_ast, avg_tov)
+
+alltime_fmt %>%
+  filter(conference == "East") %>%
+  select(-conference) %>%
+  kable(
+    format    = "html",
+    escape    = FALSE,
+    caption   = "Eastern Conference Team Averages (2009–2025)",
+    col.names = c("Division", "", "Team", "Seasons", "Win%",
+                  "PTS", "eFG%", "3PA", "REB", "AST", "TOV")
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width        = TRUE,
+    font_size         = 13
+  ) %>%
+  kableExtra::collapse_rows(columns = 1, valign = "middle")
+#repeat for the West
+alltime_fmt %>%
+  filter(conference == "West") %>%
+  select(-conference) %>%
+  kable(
+    format    = "html",
+    escape    = FALSE,
+    caption   = "Western Conference Team Averages (2009–2025)",
+    col.names = c("Division", "", "Team", "Seasons", "Win%",
+                  "PTS", "eFG%", "3PA", "REB", "AST", "TOV")
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width        = TRUE,
+    font_size         = 13
+  ) %>%
+  kableExtra::collapse_rows(columns = 1, valign = "middle")
+```
+
+**Atlantic Division**
+
+Boston leads the Atlantic with a 60.1% win rate, the highest in the Eastern Conference, supported by strong efficiency (52.2% eFG%) and low turnovers (13.8). Toronto (50.1%) remains a consistently competitive franchise, highlighted by sustained success in the Lowry–DeRozan era and a championship peak in 2019. Philadelphia (45.5%) reflects cyclical rebuilding phases with intermittent contention. New York (44.0%) and Brooklyn (40.9%) both show long-term inconsistency despite varying levels of roster talent.
+
+**Central Division**
+
+The Central is tightly clustered, with Milwaukee (52.7%), Indiana (51.3%), and Cleveland (50.8%) all sustaining above-average performance. Chicago (49.7%) sits just below league average, reflecting moderate competitiveness across the era. Detroit (37.1%) is a clear outlier, ranking last in both win rate and scoring efficiency (102.2 PPG), signaling prolonged organizational struggles.
+
+**Southeast Division**
+
+Miami dominates the division at 57.2%, ranking among the league’s elite franchises across multiple competitive eras. Atlanta (49.8%) maintains steady mid-tier performance without sustained contention peaks. Orlando (43.6%), Washington (39.1%), and Charlotte (39.3%) occupy the lower tier, reflecting extended rebuild cycles and limited postseason success.
+
+**Northwest Division**
+
+Denver (57.2%) and Oklahoma City (56.9%) anchor the division as elite franchises, both combining high win rates with strong two-way efficiency. Utah (50.7%) and Portland (50.0%) remain near league average, while Minnesota (39.9%) consistently underperforms relative to talent cycles, ranking last in the division.
+
+
+**Pacific Division**
+
+Golden State (56.3%) defines the modern NBA, leading the division in scoring (110.1), efficiency (53.4% eFG%), assists (26.1), and three-point volume (30.2). The Clippers (54.9%) represent sustained success without a championship breakthrough, while the Lakers (50.6%) fluctuate around league average during roster transitions. Phoenix shows late-era improvement, while Sacramento reflects long-term struggles before recent resurgence.
+
+**Southwest Division**
+
+The Southwest features two of the most efficient franchises in the dataset: Dallas (53.0%) and San Antonio (56.9%), both elite in turnover control (13.0 and 13.3). Houston stands out for extreme three-point volume (32.9 per game), emblematic of the analytics-driven era shift. Memphis (50.9%) is a stable mid-tier team, while New Orleans (44.4%) reflects ongoing roster instability and rebuild cycles.
+
+---
+
+# 8. Win% Leaders by Division — All Time
+
+Even within divisions, success is not evenly distributed. This section isolates the top-performing teams in each division over time, revealing where sustained dominance—and competitive balance—has existed.
+
+```{r plot-alltime-winpct, echo=FALSE, fig.height=8, fig.width=12, message=FALSE, warning=TRUE}
+alltime %>%
+  group_by(division) %>%
+  slice_max(avg_win_pct, n = 3) %>%
+  ungroup() %>%
+  ggplot(aes(x = reorder(team, avg_win_pct),
+             y = avg_win_pct, fill = conference)) +
+  geom_col(alpha = 0.85) +
+  geom_image(aes(image = logo, y = 0.1),
+             size = 0.1, asp = 1.5) +
+  geom_text(aes(label = paste0(round(avg_win_pct * 100, 1), "%")),
+            hjust = -0.2, size = 3) +
+  coord_flip() +
+  facet_wrap(~ division, scales = "free_y") +
+  scale_fill_manual(values = c("East" = "#1A1A2E", "West" = "#FDBB30")) +
+  scale_y_continuous(labels = function(x) paste0(round(x * 100, 1), "%"),
+                     limits = c(0, 0.85)) +
+  labs(
+    title = "Top 3 Teams by Win% Per Division — All Time (2009–2025)",
+    x     = NULL,
+    y     = "Average Win %",
+    fill  = "Conference"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text  = element_text(face = "bold"),
+    axis.text.y = element_blank()  # hide abbreviations since logos replace them
+  )
+```
+**Figure 9: Top 3 Teams by Win Percentage Per Division — All Time (2009–2025)** *The three highest win percentage franchises within each division across the modern era. Boston (60.1%), Miami (57.2%), and San Antonio (56.9%) lead their respective divisions by the widest margins.*
+
+Across the 2009–2025 era, NBA team performance is best understood through franchise tiers rather than conference or division alignment. A small group of consistently elite organizations — including Boston, Miami, Denver, Oklahoma City, San Antonio, and Golden State — combine high win rates with strong offensive efficiency and long-term structural stability. The middle tier of teams, such as Toronto, Indiana, Cleveland, Dallas, Memphis, the Lakers, and the Clippers, remain competitive but fluctuate in performance across different roster cycles. At the lower end, franchises like Charlotte, Washington, Detroit, Sacramento, and Minnesota struggle to sustain winning cultures, often cycling through rebuilds without consistent improvement. Overall, while divisional identity still exists, the modern NBA is increasingly defined by organizational consistency and strategic execution rather than geographic grouping.
+
+---
+
+# 9. Three-Point Revolution by Division
+
+The rise of the three-point shot reshaped the NBA, but not all teams adapted at the same pace. This section tracks how three-point usage evolved across divisions, showing how a strategic shift became a league-wide standard.
+
+```{r plot-3pa-division, echo=FALSE, fig.height=8, fig.width=12, message=FALSE, warning=FALSE}
+team_season %>%
+  filter(!is.na(division)) %>%
+  group_by(season, division, conference) %>%
+  summarise(avg_x3pa = mean(x3pa, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(x = season, y = avg_x3pa, color = conference)) +
+  geom_line(linewidth = 0.9) +
+  facet_wrap(~ division) +
+  scale_color_manual(values = c("East" = "#1A1A2E", "West" = "#FDBB30")) +
+  labs(
+    title    = "Three-Point Attempts Per Game by Division: 2009–2025",
+    subtitle = "The three-point revolution unfolded at different rates across divisions",
+    x        = "Season",
+    y        = "Avg 3PA Per Game",
+    color    = "Conference"
+  ) +
+  theme_minimal() +
+  theme(strip.text = element_text(face = "bold"))
+```
+**Figure 10: Three-Point Attempts Per Game by Division (2009–2025)** *Average three-point attempts per game by division from 2009–2025. All six divisions started the period near 16–19 attempts and converged toward 37–38 by 2025, reflecting the complete league-wide adoption of perimeter-oriented offense.*
+
+The division-level three-point attempt data reveals that while the revolution was league-wide, it did not unfold uniformly — different divisions adopted perimeter-heavy offense at different speeds and from different starting points.
+
+**Early adopters (2009–2014):** All six divisions started the modern era in a remarkably similar range of 16–19 three-point attempts per game, with no division standing out as a clear outlier. The Pacific (18.4 in 2009) and Atlantic (18.4) were marginally ahead, while the Northwest (16.2) was the slowest to start. Growth through 2014 was gradual across the board, with most divisions reaching the low-to-mid 20s by 2015.
+
+**The acceleration phase (2015–2019):** The sharpest divergence emerged here. The Southwest jumped from 22.9 in 2015 to 29.4 in 2017 — the Harden-era Rockets pulling the entire division's average up dramatically. The Northwest similarly surged, reaching 31.5 by 2019. The Eastern divisions lagged slightly behind but were closing the gap fast, with the Atlantic crossing 32.8 and the Southeast reaching 33.8 by 2019.
+
+**Saturation and convergence (2020–2025):** By 2020 all six divisions had crossed 32 attempts per game and the gaps between them had narrowed significantly. The Northwest peaked earliest and most dramatically at 38.2 in 2021 — driven by Denver and Utah pushing pace — before pulling back to 33.6 in 2024 and rebounding to 37.5 in 2025. The Atlantic finished the period as the highest-volume division at 38.3 in 2025, with the Central close behind at 38.1.
+
+The most striking finding is how completely the convergence has played out. In 2009 the gap between the highest and lowest division was just 3 attempts (19.2 Southeast vs 16.2 Northwest). By 2025 that gap has narrowed to just 1.3 attempts (38.3 Atlantic vs 37.0 Pacific) — six divisions that once had distinct offensive identities now operating almost identically from beyond the arc.
+
+---
+
+# 10. What Actually Drives Winning?
+
+With league trends and team performance established, the final step is to connect process to outcomes. This section examines the relationship between shooting efficiency and win percentage to evaluate how strongly offensive performance translates to success.
+
+```{r plot-efg-win, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+team_season %>%
+  filter(!is.na(conference)) %>%
+  ggplot(aes(x = efg, y = win_pct, color = conference)) +
+  geom_point(alpha = 0.2, size = 1.2) +
+  geom_smooth(method = "lm", se = TRUE, linewidth = 1.2) +
+  scale_color_manual(values = c("East" = "#1A1A2E", "West" = "#FDBB30")) +
+  scale_x_continuous(labels = function(x) paste0(round(x * 100, 1), "%"))+
+  scale_y_continuous(labels = function(x) paste0(round(x * 100, 0), "%")) +
+  labs(
+    title    = "eFG% vs. Win% — All Teams, All Seasons (2009–2025)",
+    subtitle = "Each point represents one team-season",
+    x        = "Effective FG%",
+    y        = "Win %",
+    color    = "Conference"
+  ) +
+  theme_minimal()
+```
+**Figure 11: Effective Field Goal Percentage vs. Win Percentage — All Teams, All Seasons (2009–2025)** *Each point represents one team-season. The positive correlation (r = 0.47) between eFG% and win percentage holds consistently across both conferences, indicating that shooting efficiency is a meaningful but non-deterministic predictor of team success.*
+
+Across all 30 teams and 17 seasons, effective field goal percentage shows a moderate but meaningful positive correlation with win percentage (r = 0.470). Teams that shoot more efficiently tend to win more — but the relationship is far from deterministic, reflecting the reality that defense, pace, turnover management, and roster construction all contribute independently to winning.
+
+The correlation is nearly identical across both conferences — East (r = 0.466) and West (r = 0.459) — suggesting that shooting efficiency is an equally important predictor of success regardless of conference. The West's slightly lower correlation may reflect the fact that Western teams face stiffer competition night-to-night, meaning that even highly efficient offenses can lose to elite defensive teams more frequently than they would in the East.
+
+The scatter plot makes the relationship visually clear — there is a discernible upward trend as eFG% increases, but the wide spread of points around the regression line at any given efficiency level reinforces that no single metric tells the whole story. Some of the most efficient teams in a given season still finished below .500, while some lower-efficiency teams overperformed through defensive dominance or exceptional depth.
+
+Taken alongside the league-wide eFG% trend — which rose from 49.9% in 2009 to 54.1% in 2025 — this correlation suggests that the teams best positioned to win in the modern era are those that adopted efficient offense earliest and most completely. The franchises at the top of the all-time win% table — San Antonio, Boston, Miami, Golden State — are without exception among the most efficient shooting teams of their respective eras.
+
+---
+
+# 11. Conclusion
+
+The modern NBA is defined less by stylistic differences between teams and more by execution within a shared offensive framework. Over the past 17 seasons, the league has converged toward a common model built around pace, spacing, and three-point shooting.
+
+However, while nearly all teams now generate offense in similar ways, the ability to convert efficiently—and complement that efficiency with defensive activity and ball security—remains the key differentiator between winning and losing teams.
+
+The findings suggest that success in today’s NBA is not about adopting the three-point revolution, but about optimizing within it. Teams that combine high shooting efficiency with disciplined playmaking and defensive disruption are best positioned to sustain long-term success.
+
+Future analysis could extend this work by incorporating advanced metrics such as pace, offensive rating, and lineup-level data to better isolate the drivers of team performance.
+
+---
+
+© Lindsey Hornberger 2026
+
