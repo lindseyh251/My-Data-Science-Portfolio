@@ -22,7 +22,7 @@ A multi-game interactive dashboard analyzing the 2026 NBA Finals (Games 1–5). 
 
 A longitudinal team-level analysis spanning 16 seasons of NBA data, identifying the statistical factors most predictive of regular season success. Structured as a front-office style report with insight-led prose, annotated visualizations, and key takeaway callouts. Examines how the league's winning formula has evolved — from post-heavy to pace-and-space — and what that means for roster construction today.
 
-📄 [View PDF report](./What%20Drives%20Winning%20in%20the%20Modern%20NBA_%20(2009%E2%80%932025%20Analysis).pdf) | 📁 [View Rmd source](./nba_team_analysis.Rmd)
+📄 [View PDF Report](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/64edf2ac16e46adb670b587853e6224dfb864419/my_projects/sports/basketball/What%20Drives%20Winning%20in%20the%20Modern%20NBA_%20(2009%E2%80%932025%20Analysis).pdf)
 
 ---
 
