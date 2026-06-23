@@ -8,7 +8,7 @@ Hi, I'm Lindsey! I recently graduated with a Master's degree in applied statisti
 - Tableau — interactive business intelligence analyses, data visualization, and reporting
 
 
-Go to me Sports Analytics specific portfolio [Click here](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/64edf2ac16e46adb670b587853e6224dfb864419/my_projects/sports)
+Go to me Sports Analytics specific portfolio [Click here 🏀 ](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/64edf2ac16e46adb670b587853e6224dfb864419/my_projects/sports)
 
 
 ## KU Med Courses ##
