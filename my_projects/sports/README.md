@@ -31,7 +31,7 @@ A longitudinal team-level analysis spanning 16 seasons of NBA data, identifying 
 
 Two-part project. First, engineered a composite player impact score for the 2025 Pacers by combining game-level efficiency metrics (eFG%, true shooting %, plus/minus per minute) from full-season box score data. Second, aggregated player scores to the lineup level and used them to train logistic regression and random forest models predicting game outcomes across an 82-game season. Both models achieved AUC = 0.70; plus/minus per minute emerged as the strongest individual predictor.
 
-📁 [View project folder](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/ad290bff45d092b61f8819246f5f4ce2f35fe180/my_projects/sports/basketball/pacers_impact_score_analysis) | 📄 [View win probability PDF](./Pacers_2025_W_L_Prediction_Impact.pdf)
+📁 [View project folder](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/ad290bff45d092b61f8819246f5f4ce2f35fe180/my_projects/sports/basketball/pacers_impact_score_analysis) | 📄 [View win probability PDF](https://github.com/lindseyh251/My-Data-Science-Portfolio/blob/ad290bff45d092b61f8819246f5f4ce2f35fe180/my_projects/sports/basketball/pacers_impact_score_analysis/Pacers_Impact_Players.png)
 
 ---
 
