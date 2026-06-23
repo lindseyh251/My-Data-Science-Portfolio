@@ -13,7 +13,7 @@ The projects below reflect how I approach basketball as an analytical problem: s
 
 A multi-game interactive dashboard analyzing the 2026 NBA Finals (Games 1–5). Built using ESPN play-by-play and box score data via the `hoopR` package. Features include shot charts with full court geometry, team offensive efficiency metrics, value box summaries, and per-game performance breakdowns for both teams. Designed to mirror the kind of nightly reporting and game-prep output used by analytics staffs during a postseason run.
 
-📁 [View project folder](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/fff2389efaa4b1edf56c9682921fbb962c7c197e/my_projects/sports/basketball/2026_nba_finals_performance_analysis)
+📁 [View project folder](https://github.com/lindseyh251/My-Data-Science-Portfolio/tree/5c62cb3d788a0b746aa2530d5972ac37f3335841/my_projects/sports/basketball/2026_nba_finals_performance_analysis)
 
 ---
 
