@@ -1,0 +1,480 @@
+---
+title: "NBA Finals Lineup Tracker"
+author: "Lindsey Hornberger"
+date: "2026-06-23"
+output: html_document
+---
+
+```{r}
+library(hoopR)
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+all_pbp <- load_nba_pbp(seasons = 2026)
+
+pbp_g1 <- all_pbp |> filter(game_id == 401859963)
+pbp_g2 <- all_pbp |> filter(game_id == 401859964)
+pbp_g3 <- all_pbp |> filter(game_id == 401859965)
+pbp_g4 <- all_pbp |> filter(game_id == 401859966)
+pbp_g5 <- all_pbp |> filter(game_id == 401859967)
+```
+
+```{r}
+# Function to process one game
+process_game <- function(pbp, game_num, spurs_id, knicks_id, 
+                         spurs_starters, knicks_starters) {
+  
+  subs <- pbp |>
+    filter(type_text == "Substitution") |>
+    select(period_number, start_game_seconds_remaining,
+           athlete_id_1, athlete_id_2, team_id, text) |>
+    arrange(desc(start_game_seconds_remaining))
+  
+  spurs <- track_lineups(subs, spurs_id, spurs_starters) |>
+    mutate(team = "Spurs", game = game_num)
+  
+  knicks <- track_lineups(subs, knicks_id, knicks_starters) |>
+    mutate(team = "Knicks", game = game_num)
+  
+  bind_rows(spurs, knicks)
+}
+
+# Define star players
+spurs_stars <- c(4066259, 5104157, 4845367)  # Fox, Wembanyama, Castle
+knicks_stars <- c(3934672, 3136195, 3934719)  # Brunson, Towns, Anunoby
+
+# Detailed star categorization
+categorize_lineup_detailed <- function(lineup_str, stars, star_names) {
+  ids <- as.integer(str_split(lineup_str, "-")[[1]])
+  on_court <- star_names[stars %in% ids]
+  n <- length(on_court)
+  
+  if (n == 3) return("All 3")
+  if (n == 2) return(paste(sort(on_court), collapse = " + "))
+  if (n == 1) return(on_court)
+  return("None")
+}
+
+spurs_star_ids   <- c(4066259, 5104157, 4845367)
+spurs_star_names <- c("Fox", "Wemby", "Castle")
+
+knicks_star_ids   <- c(3934672, 3136195, 3934719)
+knicks_star_names <- c("Brunson", "Towns", "OG")
+
+all_games <- all_games |>
+  mutate(
+    star_group = case_when(
+      team == "Spurs"  ~ map_chr(lineup, ~categorize_lineup_detailed(
+                                   .x, spurs_star_ids, spurs_star_names)),
+      team == "Knicks" ~ map_chr(lineup, ~categorize_lineup_detailed(
+                                   .x, knicks_star_ids, knicks_star_names))
+    )
+  )
+
+all_games |>
+  group_by(team, star_group) |>
+  summarise(total_seconds = sum(duration), .groups = "drop") |>
+  arrange(team, desc(total_seconds))
+```
+
+# build colors palette 
+```{r}
+# Color palette
+# Spurs
+spurs_colors <- c(
+  "All 3"          = "#1A1A1A",  
+  "Fox + Wemby"    = "#4A4A4A",  
+  "Castle + Wemby" = "#7A7A7A", 
+  "Castle + Fox"   = "#A8A8A8",  
+  "Fox"            = "#C8102E",  
+  "Wemby"          = "#E8604C", 
+  "Castle"         = "#F4A582", 
+  "None"           = "#E0E0E0"   
+)
+
+# Knicks
+knicks_colors <- c(
+  "All 3"          = "#003DA5",  
+  "Brunson + OG"   = "#0060C0",  
+  "OG + Towns"     = "#00A86B",  
+  "Brunson + Towns"= "#90BBE8",  
+  "Brunson"        = "#F58426",  
+  "Towns"          = "#8B2FC9", 
+  "OG"             = "#FAC99A", 
+  "None"           = "#E0E0E0"
+)
+
+# Prep plot data
+plot_data <- all_games |>
+  mutate(
+    x_start    = 2880 - time_start,
+    x_end      = 2880 - time_end,
+    game_label = factor(paste("Game", game), 
+                        levels = paste("Game", 5:1))
+  )
+
+# Build chart function
+make_chart <- function(data, team_name, color_map, subtitle_text) {
+  data |>
+    filter(team == team_name) |>
+    mutate(star_group = factor(star_group, levels = names(color_map))) |>
+    ggplot(aes(xmin = x_start, xmax = x_end,
+               ymin = as.numeric(game_label) - 0.4,
+               ymax = as.numeric(game_label) + 0.4,
+               fill = star_group)) +
+    geom_rect(color = NA, linewidth = 0.3) +
+    geom_vline(xintercept = c(720, 1440, 2160),
+               linetype = "dashed", color = "gray50", linewidth = 0.5) +
+    scale_fill_manual(values = color_map, drop = FALSE) +
+    scale_x_continuous(
+        breaks = c(360, 1080, 1800, 2520),
+        labels = c("Q1", "Q2", "Q3", "Q4"),
+        limits = c(0, 2880),
+        expand = c(0, 0)  
+      ) +
+    scale_y_continuous(
+      breaks = 1:5,
+      labels = levels(data |> 
+                        filter(team == team_name) |> 
+                        pull(game_label))
+    ) +
+    labs(
+      title    = paste(team_name, "— Star Lineup Tracker | 2026 NBA Finals"),
+      subtitle = subtitle_text,
+      x = NULL, y = NULL,
+      fill = NULL
+    ) +
+    theme_bw() +
+    theme(
+      panel.grid      = element_blank(),
+      axis.text.x     = element_text(size = 10, face = "bold"),
+      axis.text.y     = element_text(size = 10, face = "bold"),
+      legend.position = "bottom",
+      legend.text     = element_text(size = 9),
+      plot.title      = element_text(face = "bold", size = 13),
+      plot.subtitle   = element_text(size = 10, color = "gray40")
+    ) +
+    guides(fill = guide_legend(nrow = 2))
+}
+
+p_spurs <- make_chart(plot_data, "Spurs",
+                      spurs_colors,
+                      "Playing time of Fox + Wembanyama + Castle during series")
+
+p_knicks <- make_chart(plot_data, "Knicks",
+                       knicks_colors,
+                       "Playing time of Brunson + Towns + Anunoby during series")
+
+p_spurs
+p_knicks
+```
+
+```{r}
+# Calculate percentage breakdown per team per game
+pct_data <- all_games |>
+  group_by(team, game, star_group) |>
+  summarise(seconds = sum(duration), .groups = "drop") |>
+  group_by(team, game) |>
+  mutate(pct = seconds / sum(seconds) * 100) |>
+  ungroup() |>
+  mutate(
+    game_label = paste("Game", game),
+    star_group = factor(star_group, levels = c(
+      "All 3", 
+      "Fox + Wemby", "Castle + Wemby", "Castle + Fox",
+      "Fox", "Wemby", "Castle",
+      "Brunson + OG", "OG + Towns", "Brunson + Towns",
+      "Brunson", "Towns", "OG",
+      "None"
+    ))
+  )
+
+# Lollipop chart function
+make_lollipop <- function(data, team_name, color_map, subtitle_text) {
+  data |>
+    filter(team == team_name) |>
+    mutate(star_group = factor(star_group, levels = names(color_map))) |>
+    ggplot(aes(x = pct, y = star_group, color = star_group)) +
+    geom_segment(aes(x = 0, xend = pct, 
+                     y = star_group, yend = star_group),
+                 linewidth = 0.8) +
+    geom_point(size = 4) +
+    geom_text(aes(label = paste0(round(pct, 1), "%")),
+              hjust = -0.3, size = 3, color = "gray30") +
+    facet_wrap(~game_label, nrow = 1) +
+    scale_color_manual(values = color_map, drop = FALSE) +
+    scale_x_continuous(limits = c(0, 75),
+                       breaks = c(0, 25, 50),
+                       labels = c("0%", "25%", "50%")) +
+    labs(
+      title    = paste(team_name, "— Star Group Time Share by Game | 2026 NBA Finals"),
+      subtitle = subtitle_text,
+      x = "% of game time", y = NULL
+    ) +
+    theme_bw() +
+    theme(
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor   = element_blank(),
+      strip.text         = element_text(face = "bold", size = 10),
+      axis.text.y        = element_text(size = 9),
+      axis.text.x        = element_text(size = 8),
+      legend.position    = "none",
+      plot.title         = element_text(face = "bold", size = 13),
+      plot.subtitle      = element_text(size = 10, color = "gray40")
+    )
+}
+
+lollipop_spurs <- make_lollipop(
+  pct_data, "Spurs", spurs_colors,
+  "% of game time with Fox + Wembanyama + Castle on floor"
+)
+
+lollipop_knicks <- make_lollipop(
+  pct_data, "Knicks", knicks_colors,
+  "% of game time with Brunson + Towns + Anunoby on floor"
+)
+
+lollipop_spurs
+lollipop_knicks
+```
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+# Get score differential at every pbp moment for all 5 games
+score_data <- bind_rows(
+  pbp_g1 |> mutate(game = 1),
+  pbp_g2 |> mutate(game = 2),
+  pbp_g3 |> mutate(game = 3),
+  pbp_g4 |> mutate(game = 4),
+  pbp_g5 |> mutate(game = 5)
+) |>
+  select(game, start_game_seconds_remaining, 
+         home_score, away_score,
+         home_team_id, away_team_id) |>
+  mutate(
+    spurs_margin = case_when(
+      home_team_id == 24 ~ home_score - away_score,
+      away_team_id == 24 ~ away_score - home_score
+    )
+  ) |>
+  arrange(game, desc(start_game_seconds_remaining))
+
+# Convert lineup segments to per-second lookup for each team
+expand_segments <- function(segs, team_name) {
+  segs |>
+    filter(team == team_name) |>
+    filter(floor(time_start) >= ceiling(time_end)) |>  # drop rounding conflicts
+    mutate(second = map2(time_end, time_start, 
+                         ~seq(ceiling(.x), floor(.y), by = 1))) |>
+    unnest(second) |>
+    select(game, second, lineup, star_group)
+}
+
+spurs_by_second <- expand_segments(all_games, "Spurs")
+knicks_by_second <- expand_segments(all_games, "Knicks")
+
+# Join both teams by game and second
+# Join both teams by game and second
+matchup_data <- spurs_by_second |>
+  inner_join(knicks_by_second,
+             by = c("game", "second"),
+             suffix = c("_spurs", "_knicks")) |>
+  rename(
+    spurs_lineup = lineup_spurs,
+    knicks_lineup = lineup_knicks,
+    spurs_stars  = star_group_spurs,
+    knicks_stars = star_group_knicks
+  )
+
+# Join score data
+score_lookup <- score_data |>
+  mutate(second = round(start_game_seconds_remaining)) |>
+  group_by(game, second) |>
+  slice_tail(n = 1) |>
+  ungroup() |>
+  select(game, second, spurs_margin)
+
+matchup_data <- matchup_data |>
+  left_join(score_lookup, by = c("game", "second"))
+
+matchup_data <- matchup_data |>
+  arrange(game, desc(second)) |>
+  group_by(game) |>
+  fill(spurs_margin, .direction = "down") |>
+  ungroup()
+
+# Now calculate point differential per second for each matchup
+# We need margin change, not raw margin
+matchup_data <- matchup_data |>
+  arrange(game, desc(second)) |>
+  group_by(game) |>
+  mutate(margin_change = lag(spurs_margin) - spurs_margin) |>
+  ungroup()
+
+# Aggregate by Spurs lineup vs Knicks star group
+matchup_summary <- matchup_data |>
+  group_by(spurs_stars, knicks_stars) |>
+  summarise(
+    seconds = n(),
+    total_margin = sum(margin_change, na.rm = TRUE),
+    net_per_48 = (total_margin / seconds) * 2880,
+    .groups = "drop"
+  ) |>
+  filter(seconds >= 60) |>  # minimum 1 minute together
+  arrange(knicks_stars, desc(net_per_48))
+
+matchup_summary
+```
+
+
+```{r}
+# Filter to meaningful matchups only
+heat_data <- matchup_summary |>
+  filter(seconds >= 60) |>
+  mutate(
+    spurs_stars = factor(spurs_stars, levels = c(
+      "All 3", "Fox + Wemby", "Castle + Wemby", "Castle + Fox",
+      "Fox", "Wemby", "Castle"
+    )),
+    knicks_stars = factor(knicks_stars, levels = c(
+      "All 3", "Brunson + OG", "OG + Towns", "Brunson + Towns",
+      "Brunson", "Towns", "OG", "None"
+    )),
+    # Cap extreme values for readability
+    net_capped = pmax(pmin(net_per_48, 50), -50)
+  )
+
+# Add all combinations including missing ones
+all_combos <- expand.grid(
+  spurs_stars = levels(heat_data$spurs_stars),
+  knicks_stars = levels(heat_data$knicks_stars),
+  stringsAsFactors = FALSE
+)
+
+heat_data_full <- all_combos |>
+  left_join(heat_data, by = c("spurs_stars", "knicks_stars")) |>
+  mutate(
+    spurs_stars = factor(spurs_stars, levels = levels(heat_data$spurs_stars)),
+    knicks_stars = factor(knicks_stars, levels = levels(heat_data$knicks_stars)),
+    met_threshold = !is.na(net_per_48),
+    label = case_when(
+      !met_threshold ~ "",
+      TRUE ~ as.character(round(net_per_48, 1))
+    )
+    
+  )|>filter(knicks_stars != "None")
+
+ggplot(heat_data_full, aes(x = knicks_stars, y = spurs_stars)) +
+  geom_tile(data = filter(heat_data_full, !met_threshold),
+            fill = "#D3D3D3", color = "white", linewidth = 0.5) +
+  geom_tile(data = filter(heat_data_full, met_threshold),
+            aes(fill = net_capped), color = "white", linewidth = 0.5) +
+  geom_text(aes(label = label),
+            size = 3.5, fontface = "bold",
+            color = ifelse(abs(heat_data_full$net_capped) > 25 & 
+                          heat_data_full$met_threshold, "white", "gray20")) +
+  scale_fill_gradient2(
+    low      = "#C8102E",
+    mid      = "#FFF8E7",   # cream
+    high     = "#1D428A",
+    midpoint = 0,
+    limits   = c(-50, 50),
+    name     = "Net Pts/48\n(Spurs perspective)",
+    na.value = "#D3D3D3"
+  ) +
+  labs(
+    title    = "Spurs Matchup Matrix — 2026 NBA Finals",
+    subtitle = "Net points per 48 min | Aggregated across Games 1–5",
+caption  = "Blue = good for Spurs · Red = good for Knicks · Gray = insufficient sample (<60 sec)",
+    x        = "Knicks Star Unit on Floor",
+    y        = "Spurs Star Unit on Floor"
+  ) +
+  theme_bw() +
+  theme(
+    axis.text.x     = element_text(angle = 30, hjust = 1, size = 9),
+    axis.text.y     = element_text(size = 9),
+    plot.title      = element_text(face = "bold", size = 13),
+    plot.subtitle   = element_text(size = 10, color = "gray40"),
+    legend.position = "right"
+  )
+```
+Insight: Fox + Wemby was the Spurs' most effective counter against nearly every Knicks configuration, but the Spurs consistently under-deployed it in favor of their full star unit which repeatedly got outplayed.
+
+
+more selective matrix
+```{r}
+heat_data_selective <- all_combos |>
+  left_join(heat_data, by = c("spurs_stars", "knicks_stars")) |>
+  filter(
+    !knicks_stars %in% c("OG", "Towns", "None"),
+    !spurs_stars %in% c("Wemby", "Castle + Fox", "Fox"),
+    !is.na(spurs_stars), !is.na(knicks_stars)
+  ) |>
+  mutate(
+    spurs_stars = factor(as.character(spurs_stars), levels = c(
+      "All 3", "Fox + Wemby", "Castle + Wemby", "Castle"
+    )),
+    knicks_stars = factor(as.character(knicks_stars), levels = c(
+      "All 3", "Brunson + OG", "OG + Towns", "Brunson + Towns", "Brunson"
+    )),
+    met_threshold = !is.na(net_per_48),
+    label = case_when(
+      !met_threshold ~ "",
+      TRUE ~ as.character(round(net_per_48, 1))
+    )
+  ) |>
+  droplevels()
+  
+
+ggplot(heat_data_selective, aes(x = knicks_stars, y = spurs_stars)) +
+  geom_tile(data = filter(heat_data_selective, !met_threshold),
+            fill = "#989898", color = "white", linewidth = 0.5) +
+  geom_tile(data = filter(heat_data_selective, met_threshold),
+            aes(fill = net_capped), color = "white", linewidth = 0.5) +
+  geom_text(aes(label = label),
+            size = 3.5, fontface = "bold",
+            color = ifelse(abs(heat_data_selective$net_capped) > 25 & 
+                          heat_data_selective$met_threshold, "white", "gray20")) +
+  scale_y_discrete(limits = c("All 3", "Fox + Wemby", "Castle + Wemby", "Castle")) +
+  scale_x_discrete(limits = c("All 3", "Brunson + OG", "OG + Towns", "Brunson + Towns", "Brunson")) +
+  scale_fill_gradient2(
+    low      = "#C8102E",
+    mid      = "#FFF8E7",   # cream
+    high     = "#1D428A",
+    midpoint = 0,
+    limits   = c(-50, 50),
+    name     = "Net Pts/48\n(Spurs perspective)",
+    na.value = "#989898"
+  ) +
+  labs(
+    title    = "Spurs Matchup Matrix — 2026 NBA Finals",
+    subtitle = "Net points per 48 min | Aggregated across Games 1–5 \nBlue = Spurs | Red = Knicks | Gray = insufficient sample",
+caption  = "Fox + Wemby was the Spurs' most effective counter across nearly every Knicks configuration,\nyet the Spurs consistently over-deployed their full star unit — which got outplayed in the same matchups.",
+    x        = "Knicks Star Unit on Floor",
+    y        = "Spurs Star Unit on Floor"
+  ) +
+  theme_bw() +
+  theme(
+    axis.text.x     = element_text(angle = 30, hjust = 1, size = 12),
+    axis.text.y     = element_text(size = 12),
+    axis.title  = element_text(face = "bold"),
+    plot.title      = element_text(face = "bold", size = 13),
+    plot.subtitle   = element_text(size = 10, color = "gray40"),
+    plot.caption = element_text(size = 10, color = "black", hjust = 0.5),
+    legend.position = "right")
+```
+
+Fox + Wemby was the Spurs' most effective counter against nearly every Knicks configuration, but the Spurs consistently under-deployed it in favor of their full star unit which repeatedly got outplayed.
+
+
